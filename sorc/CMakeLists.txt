@@ -26,7 +26,7 @@
 
 #=======================================================================
 
-cmake_minimum_required (VERSION 3.18)
+cmake_minimum_required (VERSION 3.15)
 project (CONTAINERS_STACK)
 
 enable_language (Fortran)
