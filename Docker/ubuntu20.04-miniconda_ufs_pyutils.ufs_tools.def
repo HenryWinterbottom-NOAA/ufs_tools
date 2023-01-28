@@ -19,7 +19,7 @@
 # -----------
 
 #    This Singularity definition file builds a Singularity image file
-#    containing the following packages:
+#    containing the following packages.
 
 #    - Ubuntu 20.04 base Linux image;
 
