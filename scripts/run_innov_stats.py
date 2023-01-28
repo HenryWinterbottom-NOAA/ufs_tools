@@ -50,6 +50,65 @@ Functions
         This is the driver-level function to invoke the tasks within
         this script.
 
+Usage
+-----
+
+    user@host:$ python run_innov_stats --<yaml_file> --<cycle> --<app> \
+                    [--expt_name]
+
+Parameters
+----------
+
+    yaml_file: str
+
+        A Python string specifying the path to the YAML-formatted
+        configuration file for the respective application type (see
+        app)
+
+        Enter the parameter value as:
+
+        --yaml_file /path/to/yaml/file or -yaml_file /path/to/yaml/file
+
+    cycle: str
+
+        A Python string specifying the respective forecast cycle; this
+        string must be formatted as %Y%m%d%H%M%S assuming the POSIX
+        convention; enter the parameter value as follows for a
+        forecast cycle beginning 0000 UTC 01 January 2000:
+
+        --cycle 20000101000000 or -cycle 20000101000000
+
+    app: str
+
+        A Python string specifying the application from which to
+        compute the innovation statistics; the following are the
+        allowable application arguments:
+
+        gsi_atmos: Gridpoint Statistical Interpolation (GSI)
+                   atmosphere observation innovation statistics and
+                   timeseries.
+
+        soca_ice: Sea-ice and Ocean Coupled Analysis (SOCA) ice
+                  observation innovation timeseries.
+
+        soca_ocean: Sea-ice and Ocean Coupled Analysis (SOCA) ocean
+                    observation innovation statistics and timeseries.
+
+        Enter the parameter value as:
+
+        --app gsi_atmos|soca_ice|soca_ocean or
+
+        -app gsi_atmos|soca_ice|soca_ocean
+
+    expt_name: str, optional
+
+        A Python string specifying an (unique) name for the respective
+        experiment; for an experiment named SPAM, enter the parameter
+        value as follows.
+
+        --expt_name SPAM or -expt_name SPAM
+
+
 Author(s)
 ---------
 
