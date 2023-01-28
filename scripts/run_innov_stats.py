@@ -1,8 +1,6 @@
 # =========================================================================
 
-# $$$ SCRIPT DOCUMENTATION BLOCK
-
-# UFS-RNR-containers :: innov_stats/py/innov_stats/innov_stats.py
+# Script: scripts/run_innov_stats.py
 
 # Author: Henry R. Winterbottom
 
@@ -39,13 +37,13 @@ Classes
         This is the base-class for all supported innovation statistic
         diagnostics.
 
-    InnovStatsError(msg)
-
-        This is the base-class for all exceptions; it is a sub-class
-        of Error.
-
 Functions
 ---------
+
+    error(msg)
+
+        This function is the exception handler for the respective
+        script.
 
     main()
 
@@ -66,18 +64,22 @@ History
 
 # ----
 
-import inspect
+# pylint: disable=broad-except
+# pylint: disable=unused-argument
+
+# ----
+
 import os
 import time
+from dataclasses import dataclass
 
-from confs.yaml_interface import YAML
-from innov_stats import gsi_atmos
-from innov_stats import soca_ice
-from innov_stats import soca_ocean
-from tools import fileio_interface
-from tools import parser_interface
+from exceptions import InnovStatsError
+from innov_stats import gsi_atmos, soca_ice, soca_ocean
+from schema import Optional, Or
+from tools import datetime_interface, parser_interface
+from utils import timestamp_interface
 from utils.arguments_interface import Arguments
-from utils.error_interface import Error, msg_except_handle
+from utils.error_interface import msg_except_handle
 from utils.logger_interface import Logger
 
 # ----
@@ -88,7 +90,29 @@ __email__ = "henry.winterbottom@noaa.gov"
 
 # ----
 
+# Specify whether to evaluate the format for the respective parameter
+# values.
+EVAL_SCHEMA = True
 
+# Define the schema attributes.
+CLS_SCHEMA = {
+    "yaml_file": str,
+    "cycle": Or(str, int),
+    "app": str,
+    Optional("expt_name"): Or(str, None),
+}
+
+# Define the allowable applications.
+INNOV_STATS_DICT = {
+    "gsi_atmos": gsi_atmos.GSIAtmos,
+    "soca_ice": soca_ice.SOCAIce,
+    "soca_ocean": soca_ocean.SOCAOcean,
+}
+
+# ----
+
+
+@dataclass
 class InnovStats:
     """
     Description
@@ -125,26 +149,44 @@ class InnovStats:
         """
 
         # Define the base-class attributes.
+        self.options_obj = options_obj
         self.basedir = os.getcwd()
-        self.yaml_file = options_obj.yaml_file
+        self.cycle = self.options_obj.cycle
+        self.app = self.options_obj.app
 
-        # Parse the experiment configuration file.
-        yaml_dict = YAML().read_yaml(yaml_file=self.yaml_file)
+        # Check that the analysis cycle timestamp format is valid;
+        # proceed accordingly.
+        try:
+            datetime_interface.datestrupdate(
+                datestr=self.cycle,
+                in_frmttyp=timestamp_interface.GLOBAL,
+                out_frmttyp=timestamp_interface.GLOBAL,
+            )
 
-        # Define the allowable applications; proceed accordingly.
-        self.innov_stats_dict = {
-            'gsi_atmos': gsi_atmos.GSIAtmos,
-            'soca_ice': soca_ice.SOCAIce,
-            'soca_ocean': soca_ocean.SOCAOcean}
-
-        self.innov_stats_app = parser_interface.dict_key_value(
-            dict_in=yaml_dict, key='innov_stats_app',
-            force=True, no_split=True)
-        if self.innov_stats_app is None:
-            msg = ('The innovation statistics application could '
-                   'not be determined from the user experiment '
-                   'configuration. Aborting!!!')
+        except Exception:
+            msg = (
+                "The formatting of the command line variable cycle is not of "
+                f"format {timestamp_interface.GLOBAL}; received {self.cycle} "
+                "upon entry. Aborting!!!"
+            )
             error(msg=msg)
+
+        # Define the base-class object for the respective appliction
+        # for which to compute the innovation statistics; proceed
+        # accordingly.
+        innov_stats = parser_interface.dict_key_value(
+            dict_in=INNOV_STATS_DICT, key=self.app.lower(), force=True, no_split=True
+        )
+        if innov_stats is None:
+            msg = (
+                f"The innovation statistics application {self.app} is not "
+                "supported. Aborting!!!"
+            )
+            error(msg=msg)
+
+        self.innov_stats = innov_stats(
+            options_obj=self.options_obj, basedir=self.basedir
+        )
 
     def run(self):
         """
@@ -168,29 +210,10 @@ class InnovStats:
               supported.
 
         """
-        innov_stats = parser_interface.dict_key_value(
-            dict_in=self.innov_stats_dict, key=self.innov_stats_app,
-            force=True, no_split=True)
-        if innov_stats is None:
-            msg = ('The innovation statistics application {0} is not '
-                   'supported. Aborting!!!'.format(self.innov_stats_app))
-            error(msg=msg)
 
-        app = innov_stats(yaml_file=self.yaml_file, basedir=self.basedir)
-        app.run()
+        # Compute the respective innovation statistics.
+        self.innov_stats.run()
 
-# ----
-
-
-class InnovStatsError(Error):
-    """
-    Description
-    -----------
-
-    This is the base-class for all exceptions; it is a sub-class of
-    Error.
-
-    """
 
 # ----
 
@@ -213,6 +236,7 @@ def error(msg: str) -> None:
 
     """
 
+
 # ----
 
 
@@ -226,29 +250,27 @@ def main():
 
     """
 
-    # Define the schema attributes.
-    cls_schema = {"yaml_file": str}
-
     # Collect the command line arguments.
     script_name = os.path.basename(__file__)
     start_time = time.time()
-    msg = f'Beginning application {script_name}.'
+    msg = f"Beginning application {script_name}."
     Logger().info(msg=msg)
-    options_obj = Arguments().run(eval_schema=True, cls_schema=cls_schema)
+    options_obj = Arguments().run(eval_schema=EVAL_SCHEMA, cls_schema=CLS_SCHEMA)
 
     # Launch the task.
     task = InnovStats(options_obj=options_obj)
     task.run()
 
     stop_time = time.time()
-    msg = f'Completed application {script_name}.'
+    msg = f"Completed application {script_name}."
     Logger().info(msg=msg)
     total_time = stop_time - start_time
-    msg = f'Total Elapsed Time: {total_time} seconds.'
+    msg = f"Total Elapsed Time: {total_time} seconds."
     Logger().info(msg=msg)
+
 
 # ----
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
