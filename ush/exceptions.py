@@ -36,6 +36,11 @@ Classes
         This is the base-class for exceptions encountered within the
         ush/innov_stats/compute module; it is a sub-class of Error.
 
+    InnovStatsPlottingError()
+
+        This is the base-class for exceptions encountered within the
+        ush/innov_stats/plotting module; it is a sub-class of Error.    
+
 
 Author(s)
 ---------
@@ -57,7 +62,8 @@ from utils.error_interface import Error
 
 # Define all available attributes.
 __all__ = [
-    "InnovStatsComputeError"
+    "InnovStatsComputeError",
+    "InnovStatsPlottingError"
 ]
 
 # ----
@@ -76,5 +82,18 @@ class InnovStatsComputeError(Error):
 
     This is the base-class for exceptions encountered within the
     ush/innov_stats/compute module; it is a sub-class of Error.
+
+    """
+
+# ----
+
+
+class InnovStatsPlottingError(Error):
+    """
+    Description
+    -----------
+
+    This is the base-class for exceptions encountered within the
+    ush/innov_stats/plotting module; it is a sub-class of Error.
 
     """
