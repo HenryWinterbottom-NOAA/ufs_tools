@@ -266,7 +266,8 @@ class InnovStats:
 
                     if levels_list is not None:
                         for level in levels_list:
-                            table_dict[column_frmt % int(level * column_scale)] = "REAL"
+                            table_dict[column_frmt %
+                                       int(level * column_scale)] = "REAL"
 
                     # Create the SQLite3 database table.
                     sqlite3_interface.create_table(
@@ -340,6 +341,77 @@ class InnovStats:
             error(msg=msg)
 
         return ncvar_obj
+
+    def get_depths(self):
+        """
+        Description
+        -----------
+
+        This method collects the layer information from the user
+        experiment configuration; the base-class attributes nlevs and
+        levels_obj is defined and contains the following:
+
+        layer_bottom: the bottom interface of a given layer; this is
+                      collected from the user experiment
+                      configuration.
+
+        layer_top: the top interface of a given layer; this is
+                   collected from the user experiment configuration.
+
+        layer_mean: this is the mean value of the layer_bottom and
+                    layer_top value for a given layer; it is computed
+                    within this method.
+
+        Raises
+        ------
+
+        InnovStatsError:
+
+            * raised if the depth levels information cannot be
+              determined from the user experiment configuration.
+
+        """
+
+        # Define the depth profile information from the user
+        # experiment configuration and proceed accordingly.
+        depth_levels_dict = parser_interface.dict_key_value(
+            dict_in=self.yaml_dict, key='depth_levels',
+            force=True)
+
+        if depth_levels_dict is None:
+            msg = ('The depth levels information could not be '
+                   'determined from the user experiment configuration. '
+                   'Aborting!!!')
+            error(msg=msg)
+
+        # Define the base-class attributes levels_obj; this namespace
+        # contains both the layer bounding regions (i.e., top and
+        # bottom layer interfaces for the respective level) as well as
+        # the mean value for the respective interval (i.e., the layer
+        # mean -- the middle of the layer).
+        levels_attr_dict = {'depth_bottom': 'layer_bottom', 'depth_top':
+                            'layer_top'}
+        for (levels_attr, _) in levels_attr_dict.items():
+            value = parser_interface.dict_key_value(
+                dict_in=depth_levels_dict, key=levels_attr,
+                force=True)
+
+            if value is None:
+                msg = ('The attribute {0} could not be determined from '
+                       'the user experiment configuration. Aborting!!!'.
+                       format(levels_attr))
+                error(msg=msg)
+
+            levels = [float(level) for level in value]
+
+            self.levels_obj = parser_interface.object_setattr(
+                object_in=self.levels_obj, key=levels_attr_dict[levels_attr],
+                value=levels)
+
+        value = [statistics.mean(k) for k in zip(self.levels_obj.layer_bottom,
+                                                 self.levels_obj.layer_top)]
+        self.levels_obj = parser_interface.object_setattr(
+            object_in=self.levels_obj, key='layer_mean', value=value)
 
     def get_diagsinfo(self) -> None:
         """
@@ -815,7 +887,8 @@ class InnovStats:
         # bottom layer interfaces for the respective level) as well as
         # the mean value for the respective interval (i.e., the layer
         # mean -- the middle of the layer).
-        levels_attr_dict = {"plevs_bottom": "layer_top", "plevs_top": "layer_bottom"}
+        levels_attr_dict = {"plevs_bottom": "layer_top",
+                            "plevs_top": "layer_bottom"}
 
         for (levels_attr, _) in levels_attr_dict.items():
 

@@ -39,7 +39,6 @@ Classes
         Interpolation (GSI) atmosphere innovation statistics
         diagnostics; it is a sub-class of InnovStats.
 
-
 Author(s)
 ---------
 
@@ -531,6 +530,8 @@ class GSIAtmos(InnovStats):
 
         """
 
+        # Determine the observation locations that are valid for the
+        # specified region of interest.
         msg = f"Computing innovation statistics for region {region}."
         self.logger.info(msg=msg)
         nclat = netcdf4_interface.ncreadvar(
@@ -540,8 +541,6 @@ class GSIAtmos(InnovStats):
             ncfile=ncfilename, ncvarname=innovinfo_obj.nclon
         )
 
-        # Determine the observation locations that are valid for the
-        # specified region of interest.
         region_info_obj = parser_interface.object_define()
         region_info_dict = parser_interface.object_getattr(
             object_in=self.regions_obj, key=region
@@ -692,7 +691,7 @@ class GSIAtmos(InnovStats):
 
         return obslocs
 
-    def run(self):
+    def run(self) -> None:
         """
         Description
         -----------
@@ -738,8 +737,8 @@ class GSIAtmos(InnovStats):
 
             innov_var_obj = self.get_innov_var_bool(vardict=vardict)
 
-            # Update the base-class object containing the
-            # respective netCDF variable attributes.
+            # Update the base-class object containing the respective
+            # netCDF variable attributes.
             dimsdict = {
                 "plevs": {
                     "size": len(self.levels_obj.layer_mean),
@@ -760,11 +759,13 @@ class GSIAtmos(InnovStats):
 
                 # Compute the specific humidity innovation statistics.
                 if innov_var_obj.is_spechumid:
-                    self.innov_spechumid(ncfilename=ncfilename, vardict=vardict)
+                    self.innov_spechumid(
+                        ncfilename=ncfilename, vardict=vardict)
 
                 # Compute the temperature innovation statisitics.
                 if innov_var_obj.is_temperature:
-                    self.innov_temperature(ncfilename=ncfilename, vardict=vardict)
+                    self.innov_temperature(
+                        ncfilename=ncfilename, vardict=vardict)
 
                 # Compute the wind innovation statistics.
                 if innov_var_obj.is_wind:
