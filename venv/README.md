@@ -4,7 +4,7 @@ The following describes how to configure a Python virtual environment
 to allow for the use of selected `ufs_tools` applications. Please note
 that the remapper applications are not supported by this virtual
 environment/stack. The Docker and/or Singularity containers should be
-used instead for those applications (see [here](../Docker).
+used instead for those applications (see [here](../Docker)).
 
 ### Building the Virtual Environment
 
