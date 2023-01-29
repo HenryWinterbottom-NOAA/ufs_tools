@@ -38,6 +38,14 @@ Classes
         This is the base-class object for all innovation statistics
         sub-classes.
 
+Functions
+---------
+
+    error(msg)
+
+        This function is the exception handler for the respective
+        module.
+
 Author(s)
 ---------
 
@@ -53,14 +61,17 @@ History
 # ----
 
 # pylint: disable=broad-except
+# pylint: disable=too-many-instance-attributes
 # pylint: disable=too-many-lines
 # pylint: disable=too-many-locals
 # pylint: disable=undefined-loop-variable
+# pylint: disable=unnecessary-dict-index-lookup
 # pylint: disable=unused-argument
 
 # ----
 
 import os
+import statistics
 import sys
 
 import numpy
@@ -88,35 +99,24 @@ class InnovStats:
     -----------
 
     This is the base-class object for all innovation statistics
-    sub-classes.
+    calculations and output file generation.
 
     Parameters
     ----------
 
-    yaml_file: str
+    options_obj: object
 
-        A Python string specifying the path to the experiment
-        configuration file.
+        A Python object containing the command line argument
+        attributes.
 
     basedir: str
 
         A Python string specifying the top-level of the working
         directory tree.
 
-    Keywords
-    --------
-
-    cyclestrfrmt: str, optional
-
-        A Python string specifying the format of the environment
-        variable CYCLE value; this assumes a POSIX complaint format;
-        if NoneType on entry, a format of %Y%m%d%H%M%S is assumed.
-
     """
 
-    @classmethod
-    def __init__(cls: object, yaml_file: str, basedir: str,
-                 ncconcat_filename: str = None):
+    def __init__(self: object, options_obj: object, basedir=str):
         """
         Description
         -----------
@@ -126,22 +126,31 @@ class InnovStats:
         """
 
         # Define the base-class attributes.
-        self = cls
+        # self = cls
         self.logger = Logger()
-        (self.basedir, self.ncconcat_filename, self.yaml_file) = \
-            (basedir, ncconcat_filename, yaml_file)
-        self.stats_type_list = ["bias", "count", "rmsd"]
-        self.diagsinfo_obj = parser_interface.object_define()
+        self.options_obj = options_obj
+        self.basedir = basedir
+        self.cycle = self.options_obj.cycle
 
-        # Parse the YAML-formatted experiment configuration file.
-        self.yaml_dict = YAML().read_yaml(yaml_file=yaml_file)
+        self.exptname = parser_interface.object_getattr(
+            object_in=self.options_obj, key="expt_name", force=True
+        )
+        if self.exptname is None:
+            self.exptname = "UNKNOWN"
+        self.yaml_dict = YAML().read_yaml(yaml_file=self.options_obj.yaml_file)
+
+        # Define the innovation statistic types.
+        self.stats_type_list = ["bias", "count", "rmsd"]
 
         # Collect the relevant information from the experiment
         # configuration.
+        self.diagsinfo_obj = parser_interface.object_define()
+        self.regions_obj = self.get_regions()
+        self.diagsvars = self.get_diagsinfo()
         self.levels_obj = parser_interface.object_define()
 
     def build_database(
-            self, column_frmt: str, levels_list: list = None, column_scale: float = 1.0
+        self, column_frmt: str, levels_list: list = None, column_scale: float = 1.0
     ) -> None:
         """
         Description
@@ -257,8 +266,7 @@ class InnovStats:
 
                     if levels_list is not None:
                         for level in levels_list:
-                            table_dict[column_frmt %
-                                       int(level * column_scale)] = "REAL"
+                            table_dict[column_frmt % int(level * column_scale)] = "REAL"
 
                     # Create the SQLite3 database table.
                     sqlite3_interface.create_table(
@@ -321,7 +329,8 @@ class InnovStats:
                     }
                 }
                 ncvar_obj = self.update_ncvar(
-                    ncvar_dict=ncvar_dict, ncvar_obj=ncvar_obj)
+                    ncvar_dict=ncvar_dict, ncvar_obj=ncvar_obj
+                )
 
         except Exception as errmsg:
             msg = (
@@ -331,69 +340,6 @@ class InnovStats:
             error(msg=msg)
 
         return ncvar_obj
-
-    def get_cycle(self) -> str:
-        """
-        Description
-        -----------
-
-        This method collects and analysis cycle attribute from the
-        experiment configuration file.
-
-        Returns
-        -------
-
-        cycle: str
-
-            A Python string specifying the analysis cycle string
-            collected from the experiment configuration file.
-
-        Raises
-        ------
-
-        InnovStatsError:
-
-            * raised if the variable CYCLE cannot be found in the
-              run-time environment.
-
-            * raised if the formatting for the variable CYCLE is not
-              consistent with that specified upon instantation of the
-              base-class.
-
-        """
-
-        # Collect and format the analysis (i.e., cycle) string
-        # accordingly.
-        cycle = parser_interface.dict_key_value(
-            dict_in=self.yaml_dict, key="cycle", force=True, no_split=True
-        )
-        if cycle is None:
-            msg = (
-                "The forecast cycle could not be determined from the "
-                "experiment configuration. Aborting!!!"
-            )
-            error(msg=msg)
-
-        msg = f"The analysis cycle is {cycle}."
-        self.logger.info(msg=msg)
-
-        # Check that the analysis cycle timestamp format is valid;
-        # proceed accordingly.
-        try:
-            datetime_interface.datestrupdate(
-                datestr=str(cycle),
-                in_frmttyp=timestamp_interface.GLOBAL,
-                out_frmttyp=timestamp_interface.GLOBAL,
-            )
-
-        except Exception as errmsg:
-            msg = (
-                "The formatting check of the environment variable "
-                f"CYCLE failed with error {errmsg}. Aborting!!!"
-            )
-            error(msg=msg)
-
-        return cycle
 
     def get_diagsinfo(self) -> None:
         """
@@ -439,44 +385,6 @@ class InnovStats:
             )
 
         return diagsvars
-
-    def get_exptname(self) -> str:
-        """
-        Description
-        -----------
-
-        This method defines the experiment name attribute of the
-        output netCDF formatted file for the respective innovation
-        statistic; the base-class attribute; if the experiment
-        configuration does not specify an experiment name, a value of
-        NO_NAME will be assigned.
-
-        Returns
-        -------
-
-        exptname: str
-
-            A Python string specifying the experiment name collected
-            from the experiment configuration file; if no such
-            attribute is specified, exptname is defined as NO_NAME.
-
-        """
-
-        # Collect the experiment name from the experiment
-        # configuration file.
-        exptname = parser_interface.dict_key_value(
-            dict_in=self.yaml_dict, key="exptname", force=True
-        )
-        if exptname is None:
-            msg = (
-                "The experiment configuration does not specify "
-                "a unique name for the respective experiment; assigning "
-                "a value of NO_NAME as the respective experiment name."
-            )
-            self.logger.warn(msg=msg)
-            exptname = "NO_NAME"
-
-        return exptname
 
     def get_innovinfo(self, vardict: dict, addinfo_list: list = None) -> object:
         """
@@ -532,6 +440,7 @@ class InnovStats:
         # Initialize the innovation statistics object.
         innovinfo_obj = parser_interface.object_define()
         innovinfo_attr_list = ["nclat", "nclon"]
+
         if addinfo_list is not None:
             try:
                 for item in addinfo_list:
@@ -687,7 +596,8 @@ class InnovStats:
                 datestr=self.cycle,
                 in_frmttyp=timestamp_interface.GLOBAL,
                 out_frmttyp=ncfilename,
-                offset_seconds=offset_seconds).strip()
+                offset_seconds=offset_seconds,
+            ).strip()
             path = os.path.join(self.basedir, ncfilename)
             exist = fileio_interface.fileexist(path=path)
 
@@ -740,6 +650,7 @@ class InnovStats:
         ncinfo_dict = parser_interface.dict_key_value(
             dict_in=vardict, key="ncinfo", force=True
         )
+
         if ncinfo_dict is None:
             msg = (
                 "The netCDF information could not be determined from "
@@ -750,7 +661,8 @@ class InnovStats:
         return ncinfo_dict
 
     def get_obslocs(
-            self, ncfilename: str, innovinfo_obj: object, region: str) -> numpy.array:
+        self, ncfilename: str, innovinfo_obj: object, region: str
+    ) -> numpy.array:
         """
         Description
         -----------
@@ -821,6 +733,7 @@ class InnovStats:
             nclats = netcdf4_interface.ncreadvar(
                 ncfile=ncfilename, ncvarname=innovinfo_obj.nclat
             )
+
             nclons = netcdf4_interface.ncreadvar(
                 ncfile=ncfilename, ncvarname=innovinfo_obj.nclon
             )
@@ -835,6 +748,7 @@ class InnovStats:
                 nclons >= regions_obj.lon_min,
                 nclons <= regions_obj.lon_max,
             )
+
         except Exception as errmsg:
             msg = (
                 "The determination of valid observation locations for "
@@ -843,6 +757,94 @@ class InnovStats:
             error(msg=msg)
 
         return obslocs
+
+    def get_pressures(self):
+        """
+        Description
+        -----------
+
+        This method collects the layer information from the user
+        experiment configuration; the base-class attributes nlevs and
+        levels_obj is defined and contains the following:
+
+        layer_bottom: the bottom interface of a given layer; this is
+                      collected from the user experiment
+                      configuration.
+
+        layer_top: the top interface of a given layer; this is
+                   collected from the user experiment configuration.
+
+        layer_mean: this is the mean value of the layer_bottom and
+                    layer_top value for a given layer; it is computed
+                    within this method.
+
+        Raises
+        ------
+
+        InnovStatsError:
+
+            * raised if the pressure levels information cannot be
+              determined from the user experiment configuration.
+
+        Notes
+        -----
+
+        * The orientation of the layers for the atmosphere column is
+          flipped (i.e., the layer_top value is the bottom of the
+          layer and layer_bottom is the top of the layer) due to the
+          orientation of the atmosphere pressure (isobaric) profile.
+
+        """
+
+        # Define the pressure-level information from the user
+        # experiment configuration and proceed accordingly.
+        pressure_levels_dict = parser_interface.dict_key_value(
+            dict_in=self.yaml_dict, key="pressure_levels", force=True
+        )
+
+        if pressure_levels_dict is None:
+            msg = (
+                "The pressure levels information could not be "
+                "determined from the user experiment configuration. "
+                "Aborting!!!"
+            )
+            error(msg=msg)
+
+        # Define the base-class attributes levels_obj; this namespace
+        # contains both the layer bounding regions (i.e., top and
+        # bottom layer interfaces for the respective level) as well as
+        # the mean value for the respective interval (i.e., the layer
+        # mean -- the middle of the layer).
+        levels_attr_dict = {"plevs_bottom": "layer_top", "plevs_top": "layer_bottom"}
+
+        for (levels_attr, _) in levels_attr_dict.items():
+
+            value = parser_interface.dict_key_value(
+                dict_in=pressure_levels_dict, key=levels_attr, force=True
+            )
+            if value is None:
+                msg = (
+                    f"The attribute {levels_attr} could not be determined from "
+                    "the user experiment configuration. Aborting!!!"
+                )
+                error(msg=msg)
+
+            levels = [float(level) for level in value]
+
+            self.levels_obj = parser_interface.object_setattr(
+                object_in=self.levels_obj,
+                key=levels_attr_dict[levels_attr],
+                value=levels,
+            )
+
+        value = [
+            statistics.mean(k)
+            for k in zip(self.levels_obj.layer_bottom, self.levels_obj.layer_top)
+        ]
+
+        self.levels_obj = parser_interface.object_setattr(
+            object_in=self.levels_obj, key="layer_mean", value=value
+        )
 
     def get_regions(self) -> object:
         """
@@ -853,6 +855,14 @@ class InnovStats:
         experiment configuration and defines the base-class attribute
         regions_obj and returns a table to the user stdout containing
         the attributes for the respective regions.
+
+        Returns
+        -------
+
+        regions_obj: object
+
+            A Python object containing the region attributes from the
+            experiment configuration.
 
         Raises
         ------
@@ -939,8 +949,9 @@ class InnovStats:
             "Minimum Longitude",
             "Maximum Longitude",
         ]
-        kwargs = {"tablefmt": "fancy_grid",
-                  "numalign": "center", "stralign": "center"}
+
+        kwargs = {"tablefmt": "fancy_grid", "numalign": "center", "stralign": "center"}
+
         table_obj = tabulate.tabulate(table_list, headers, **kwargs)
         sys.stdout.write(table_obj + "\n")
 
@@ -981,8 +992,9 @@ class InnovStats:
 
         return ncvar_obj
 
-    def write_database(self, vardict: dict, variable: str, column_frmt: str,
-                       column_scale: float) -> None:
+    def write_database(
+        self, vardict: dict, variable: str, column_frmt: str, column_scale: float
+    ) -> None:
         """
         Description
         -----------
@@ -1043,8 +1055,9 @@ class InnovStats:
             dict_in=diagsinfo_dict, key="ncoutfile", no_split=True
         )
         ncoutfile = datetime_interface.datestrupdate(
-            datestr=str(analdate), in_frmttyp=timestamp_interface.GLOBAL,
-            out_frmttyp=ncoutfile
+            datestr=str(analdate),
+            in_frmttyp=timestamp_interface.GLOBAL,
+            out_frmttyp=ncoutfile,
         )
 
         # Loop through all regions specified within the user
@@ -1061,11 +1074,11 @@ class InnovStats:
                     ncfile=ncoutfile, ncvarname=ncvarname
                 )
                 table_name = f"{stats_type}_{region}"
-                for (i, lev) in enumerate(self.levels_obj.layer_mean):
-                    if not numpy.isnan(ncvalues[i]):
-                        row_dict[
-                            column_frmt % int(lev * column_scale)
-                        ] = numpy.float(ncvalues[i])
+                for (idx, lev) in enumerate(self.levels_obj.layer_mean):
+                    if not numpy.isnan(ncvalues[idx]):
+                        row_dict[column_frmt % int(lev * column_scale)] = numpy.float(
+                            ncvalues[idx]
+                        )
                 contents = sqlite3_interface.read_table(
                     path=database_sql_path, table_name=table_name
                 )
@@ -1182,7 +1195,7 @@ class InnovStats:
                 "experiment_cycle": expt_cycle,
                 "_FillValue": numpy.nan,
                 "experiment_name": self.exptname,
-                "variable": variable
+                "variable": variable,
             }
 
             # Write the netCDF-formatted file containing the
@@ -1195,7 +1208,9 @@ class InnovStats:
             )
 
             ncfile = os.path.join(self.basedir, ncoutfile)
-            msg = f"Creating innovation statistics file {ncfile} for variable {variable}."
+            msg = (
+                f"Creating innovation statistics file {ncfile} for variable {variable}."
+            )
             self.logger.info(msg=msg)
 
             # Update the netCDF file with the respective variable.
@@ -1203,13 +1218,15 @@ class InnovStats:
                 ncfile=ncfile,
                 ncdim_obj=ncdim_obj,
                 ncvar_obj=ncvar_obj,
-                ncfrmt="NETCDF3_64BIT_DATA", glbattrs_dict=glbattrs_dict
+                ncfrmt="NETCDF3_64BIT_DATA",
+                glbattrs_dict=glbattrs_dict,
             )
 
         except Exception as errmsg:
             msg = (
                 f"The writing of the netCDF formatted file for variable {variable} "
-                f"failed with error {errmsg}.")
+                f"failed with error {errmsg}."
+            )
             error(msg=msg)
 
 
