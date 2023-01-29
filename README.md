@@ -5,6 +5,7 @@
 [![Dependencies](https://img.shields.io/badge/dependencies-ufs__pyutils-orange)](https://github.com/HenryWinterbottom-NOAA/ufs_pyutils)
 
 [![Python Coding Standards](https://github.com/HenryWinterbottom-NOAA/ufs_tools/actions/workflows/pycodestyle.yaml/badge.svg)](https://github.com/HenryWinterbottom-NOAA/ufs_tools/actions/workflows/pycodestyle.yaml)
+[![Container Builds](https://github.com/HenryWinterbottom-NOAA/ufs_tools/actions/workflows/containers.yaml/badge.svg)](https://github.com/HenryWinterbottom-NOAA/ufs_tools/actions/workflows/containers.yaml)
 
 # Disclaimer
 
