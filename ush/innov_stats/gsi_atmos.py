@@ -39,7 +39,6 @@ Classes
         Interpolation (GSI) atmosphere innovation statistics
         diagnostics; it is a sub-class of InnovStats.
 
-
 Author(s)
 ---------
 
