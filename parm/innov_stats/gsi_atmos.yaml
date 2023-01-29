@@ -1,0 +1,233 @@
+# Define the pressure profile configuration for the GSI conventional
+# observation diagnostics; the mean value for the respective pressure
+# layer interface values will be used to define the pressure profile
+# for the respective GSI diagnostics.
+pressure_levels:
+
+     # Define the pressure levels that define the bottom interface of
+     # the respective pressure layers; comma delimited-limited; units are
+     # hecto-Pascal's.
+     plevs_bottom: 1050.0, 1000.0, 950.0, 900.0, 850.0, 800.0, 750.0, 700.0, 650.0, 600.0, 550.0, 500.0, 450.0, 400.0, 350.0, 300.0, 250.0, 200.0, 150.0, 100., 50.0
+
+     # Define the pressure levels that define the top interface of the
+     # respective pressure layers; comma delimited-limited; units are
+     # hecto-Pascal's.
+     plevs_top: 1000.0, 950.0, 900.0, 850.0, 800.0, 750.0, 700.0, 650.0, 600.0, 550.0, 500.0, 450.0, 400.0, 350.0, 300.0, 250.0, 200.0, 150.0, 100., 50.0, 0.0
+
+#----
+
+# Define the geographical regions for observation binning.
+regions:
+
+     # Equatorial region.
+     equatorial:
+
+          # Define the northern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_max: 5.0
+
+          # Define the southern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_min: -5.0
+
+     # Global region.
+     global:
+          
+          # Define the northern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_max: 90.0
+
+          # Define the southern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_min: -90.0     
+     
+     # Northern hemisphere region.
+     north_hemis:
+
+          # Define the northern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_max: 60.0
+
+          # Define the southern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_min: 20.0
+
+     # Tropics region:
+     tropics:
+
+          # Define the northern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_max: 20.0
+
+          # Define the southern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_min: -20.0          
+          
+     # Southern hemisphere region.
+     south_hemis:
+
+          # Define the northern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_max: -20.0
+
+          # Define the southern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_min: -60.0
+          
+#----
+
+# Define the observation diagnostics file information; POSIX compliant
+# time-stamp templating is permitted.
+diagsinfo:
+
+     # Define the specific humidity variable observation diagnostics
+     # information.
+     spechumid:
+
+          # Specify whether the observation type is specific humidity.
+          is_spechumid: True
+
+          # Define the input (GSI ncdiag formatted) netCDF filename;
+          # POSIX compliant time-stamp templating is permitted.
+          ncinfile: inputs/diag_conv_q_ges.%Y%m%d%H_cntrl.nc4
+
+          # Define the netCDF filename to contain the output
+          # innovation variable fields; POSIX compliant time-stamp
+          # templating is permitted.
+          ncoutfile: outputs/innov_stats.spechumid.%Y%m%d%H%M%S.nc
+          
+          # Define the time offset, if applicable, for the netCDF file
+          # timestamp; units are seconds.
+          offset_seconds: 21600
+
+          # Define the netCDF file variable attributes.
+          ncinfo:
+               
+               # Define the netCDF file latitude variable name.
+               nclat: Latitude
+
+               # Define the netCDF file longitude variable name.
+               nclon: Longitude
+
+               # Define the netCDF file observation type variable
+               # name.
+               ncobstype: Observation_Type
+               
+               # Define the netCDF file pressure level variable name.
+               ncpres: Pressure
+
+               # Define the netCDF file observation minus first-guess
+               # (e.g., OMF) variable name for non-wind variables.
+               ncomf: Obs_Minus_Forecast_adjusted
+
+               # Define the forecast saturation specific humidity.
+               ncsatsh: Forecast_Saturation_Spec_Hum
+               
+               # Define the netCDF file analysis usage variable name.
+               ncuse: Analysis_Use_Flag
+
+          # Define the SQLite3 database filename to contain the
+          # innovation statistics attributes for the respective
+          # variable.
+          database_sql_path: outputs/gsi_convdiags.spechumid.sql
+
+     # Define the temperature variable observation diagnostics
+     # information.
+     temperature:
+
+          # Specify whether the observation type is temperature.
+          is_temperature: True
+
+          # Define the input (GSI ncdiag formatted) netCDF filename;
+          # POSIX compliant time-stamp templating is permitted.
+          ncinfile: inputs/diag_conv_t_ges.%Y%m%d%H_cntrl.nc4
+
+          # Define the netCDF filename to contain the output
+          # innovation variable fields; POSIX compliant time-stamp
+          # templating is permitted.
+          ncoutfile: outputs/innov_stats.temperature.%Y%m%d%H%M%S.nc
+          
+          # Define the time offset, if applicable, for the netCDF file
+          # timestamp; units are seconds.
+          offset_seconds: 21600
+
+          # Define the netCDF file variable attributes.
+          ncinfo:
+               
+               # Define the netCDF file latitude variable name.
+               nclat: Latitude
+
+               # Define the netCDF file longitude variable name.
+               nclon: Longitude
+
+               # Define the netCDF file observation type variable
+               # name.
+               ncobstype: Observation_Type
+               
+               # Define the netCDF file pressure level variable name.
+               ncpres: Pressure
+
+               # Define the netCDF file observation minus first-guess
+               # (e.g., OMF) variable name for non-wind variables.
+               ncomf: Obs_Minus_Forecast_adjusted
+               
+               # Define the netCDF file analysis usage variable name.
+               ncuse: Analysis_Use_Flag
+
+          # Define the SQLite3 database filename to contain the
+          # innovation statistics attributes for the respective
+          # variable.
+          database_sql_path: outputs/gsi_convdiags.temperature.sql
+
+     # Define the wind variables observation diagnostics information.
+     wind:
+
+          # Specify whether the observation type are wind variables.
+          is_wind: True
+          
+          # Define the input (GSI ncdiag formatted) netCDF filename;
+          # POSIX compliant time-stamp templating is permitted.
+          ncinfile: inputs/diag_conv_uv_ges.%Y%m%d%H_cntrl.nc4
+
+          # Define the netCDF filename to contain the output
+          # innovation variable fields; POSIX compliant time-stamp
+          # templating is permitted.
+          ncoutfile: outputs/innov_stats.uvwind.%Y%m%d%H%M%S.nc
+          
+          # Define the time offset, if applicable, for the netCDF file
+          # timestamp; units are seconds.
+          offset_seconds: 21600
+
+          # Define the netCDF file variable attributes.
+          ncinfo:
+               
+               # Define the netCDF file latitude variable name.
+               nclat: Latitude
+
+               # Define the netCDF file longitude variable name.
+               nclon: Longitude
+
+               # Define the netCDF file observation type variable
+               # name.
+               ncobstype: Observation_Type
+               
+               # Define the netCDF file pressure level variable name.
+               ncpres: Pressure
+
+               # Define the netCDF file observation minus first-guess
+               # (e.g., OMF) variable name for the zonal wind
+               # variable.
+               ncomfu: u_Obs_Minus_Forecast_unadjusted
+
+               # Define the netCDF file observation minus first-guess
+               # (e.g., OMF) variable name for the meridional wind
+               # variable.
+               ncomfv: v_Obs_Minus_Forecast_unadjusted
+               
+               # Define the netCDF file analysis usage variable name.
+               ncuse: Analysis_Use_Flag
+
+          # Define the SQLite3 database filename to contain the
+          # innovation statistics attributes for the respective
+          # variable.
+          database_sql_path: outputs/gsi_convdiags.uvwind.sql

@@ -1,0 +1,164 @@
+# Define the depth profile configuration for the SOCA insitu
+# observation diagnostics; the mean value for the respective depth
+# layer interface values will be used to define the depth profile for
+# the respective SOCA diagnostics.
+depth_levels:
+
+     # Define the depth levels that define the top interface of the
+     # respective depth layers; comma de-limited; units are meters.
+     depth_top: 0., 5., 10., 20., 30., 40., 50., 60., 70., 80., 90., 100., 125., 150., 175., 200., 225., 250., 275.0, 300., 350., 400., 450.
+     
+     # Define the depth levels that define the bottom interface of the
+     # respective depth layers; comma de-limited; units are meters.
+     depth_bottom: 5., 10., 20., 30., 40., 50., 60., 70., 80., 90., 100., 125., 150., 175., 200., 225., 250., 275.0, 300., 350., 400., 450., 500.
+
+#----
+
+# Define the geographical regions for observation binning.
+regions:
+
+     # Equatorial region.
+     equatorial:
+
+          # Define the northern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_max: 5.0
+
+          # Define the southern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_min: -5.0
+
+     # Global region.
+     global:
+          
+          # Define the northern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_max: 90.0
+
+          # Define the southern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_min: -90.0     
+     
+     # Northern hemisphere region.
+     north_hemis:
+
+          # Define the northern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_max: 60.0
+
+          # Define the southern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_min: 20.0
+
+     # Tropics region:
+     tropics:
+
+          # Define the northern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_max: 20.0
+
+          # Define the southern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_min: -20.0          
+          
+     # Southern hemisphere region.
+     south_hemis:
+
+          # Define the northern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_max: -20.0
+
+          # Define the southern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_min: -60.0
+          
+#----
+
+# Define the observation diagnostics file information; POSIX compliant
+# time-stamp templating is permitted.
+diagsinfo:
+
+     # Define the salinity variable observation diagnostics
+     # information.
+     salinity:
+
+          # Define the input SOCA netCDF filename; POSIX compliant
+          # time-stamp templating is permitted.
+          ncinfile: inputs/profile_hgodas_salinity.SOCA.3dvar.%Y%m%d%H%M%S.nc, inputs/profile_wod_salinity.SOCA.3dvar.%Y%m%d%H%M%S.nc
+
+          # Define the netCDF filename to contain the output
+          # innovation variable fields; POSIX compliant time-stamp
+          # templating is permitted.
+          ncoutfile: outputs/innov_stats.salinity.%Y%m%d%H%M%S.nc
+          
+          # Define the time offset, if applicable, for the netCDF file
+          # timestamp; units are seconds.
+          offset_seconds: 21600
+
+          # Define the netCDF file variable attributes.
+          ncinfo:
+               
+               # Define the netCDF file latitude variable name.
+               nclat: latitude@MetaData
+
+               # Define the netCDF file longitude variable name.
+               nclon: longitude@MetaData
+               
+               # Define the netCDF file depth level variable name.
+               ncdepth: depth@MetaData
+
+               # Define the netCDF file observation minus first-guess
+               # (e.g., OMF) variable name.
+               ncomf: sea_water_salinity@ombg
+
+               # Define the netCDF file variable name specifying valid
+               # observations.
+               ncqc: sea_water_salinity@EffectiveQC0
+
+          # Define the SQLite3 database filename to contain the
+          # innovation statistics attributes for the respective
+          # variable.
+          database_sql_path: outputs/soca_insitudiags.salinity.sql
+
+     # Define the temperature variable observation diagnostics
+     # information.
+     temperature:
+
+          # Define the input SOCA netCDF filename; POSIX compliant
+          # time-stamp templating is permitted.
+          ncinfile: inputs/profile_hgodas_temperature.SOCA.3dvar.%Y%m%d%H%M%S.nc, inputs/profile_wod_temperature.SOCA.3dvar.%Y%m%d%H%M%S.nc
+
+          # Define the netCDF filename to contain the output
+          # innovation variable fields; POSIX compliant time-stamp
+          # templating is permitted.
+          ncoutfile: outputs/innov_stats.temperature.%Y%m%d%H%M%S.nc
+          
+          # Define the time offset, if applicable, for the netCDF file
+          # timestamp; units are seconds.
+          offset_seconds: 21600
+
+          # Define the netCDF file variable attributes.
+          ncinfo:
+               
+               # Define the netCDF file latitude variable name.
+               nclat: latitude@MetaData
+
+               # Define the netCDF file longitude variable name.
+               nclon: longitude@MetaData
+               
+               # Define the netCDF file depth level variable name.
+               ncdepth: depth@MetaData
+
+               # Define the netCDF file observation minus first-guess
+               # (e.g., OMF) variable name.
+               ncomf: sea_water_temperature@ombg
+
+               # Define the netCDF file variable name specifying valid
+               # observations.
+               ncqc: sea_water_temperature@EffectiveQC0
+
+          # Define the SQLite3 database filename to contain the
+          # innovation statistics attributes for the respective
+          # variable.
+          database_sql_path: outputs/soca_insitudiags.temperature.sql
+

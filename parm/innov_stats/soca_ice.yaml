@@ -1,0 +1,121 @@
+# Define the geographical regions for observation binning.
+regions:
+
+     # Global region.
+     global:
+          
+          # Define the northern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_max: 90.0
+
+          # Define the southern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_min: -90.0     
+     
+     # Northern hemisphere polar region
+     north_pole:
+
+          # Define the northern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_max: 90.0
+
+          # Define the southern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_min: 60.0
+                  
+     # Southern hemisphere polar region.
+     south_pole:
+
+          # Define the northern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_max: -60.0
+
+          # Define the southern most latitudinal boundary for the
+          # respective region of interest; units are degrees.
+          lat_min: -90.0
+          
+#----
+
+# Define the observation diagnostics file information; POSIX compliant
+# time-stamp templating is permitted.
+diagsinfo:
+
+     # Define the ice area fraction variable observation diagnostics
+     # information.
+     ice_area_fraction:
+
+          # Define the input SOCA netCDF filename; POSIX compliant
+          # time-stamp templating is permitted.
+          ncinfile: inputs/icec_ssmi_emc.SOCA.3dvar.%Y%m%d%H%M%S.nc, inputs/icec_ssmi_emc_285_286.SOCA.3dvar.%Y%m%d%H%M%S.nc
+
+          # Define the netCDF filename to contain the output
+          # innovation variable fields; POSIX compliant time-stamp
+          # templating is permitted.
+          ncoutfile: outputs/innov_stats.ice_area_fraction.%Y%m%d%H%M%S.nc
+          
+          # Define the time offset, if applicable, for the netCDF file
+          # timestamp; units are seconds.
+          offset_seconds: 21600
+
+          # Define the netCDF file variable attributes.
+          ncinfo:
+               
+               # Define the netCDF file latitude variable name.
+               nclat: latitude@MetaData
+
+               # Define the netCDF file longitude variable name.
+               nclon: longitude@MetaData
+
+               # Define the netCDF file observation minus first-guess
+               # (e.g., OMF) variable name.
+               ncomf: sea_ice_area_fraction@ombg
+
+               # Define the netCDF file variable name specifying valid
+               # observations.
+               ncqc: sea_ice_area_fraction@EffectiveQC0
+
+          # Define the SQLite3 database filename to contain the
+          # innovation statistics attributes for the respective
+          # variable.
+          database_sql_path: outputs/soca_ice.ice_area_fraction.sql
+
+     # Define the ice freeboard (i.e., thickness) variable observation
+     # diagnostics information.
+     ice_thickness:
+
+          # Define the input SOCA netCDF filename; POSIX compliant
+          # time-stamp templating is permitted.
+          ncinfile: inputs/icefb_cryosat_esa_l2.SOCA.3dvar.20190506120000.nc
+
+          # Define the netCDF filename to contain the output
+          # innovation variable fields; POSIX compliant time-stamp
+          # templating is permitted.
+          ncoutfile: outputs/innov_stats.ice_thickness.%Y%m%d%H%M%S.nc
+          
+          # Define the time offset, if applicable, for the netCDF file
+          # timestamp; units are seconds.
+          offset_seconds: 21600
+
+          # Define the netCDF file variable attributes.
+          ncinfo:
+               
+               # Define the netCDF file latitude variable name.
+               nclat: latitude@MetaData
+
+               # Define the netCDF file longitude variable name.
+               nclon: longitude@MetaData
+
+               # Define the netCDF file observation minus first-guess
+               # (e.g., OMF) variable name.
+               ncomf: sea_ice_freeboard@ombg
+
+               # Define the netCDF file variable name specifying valid
+               # observations.
+               ncqc: sea_ice_freeboard@EffectiveQC0
+
+          # Define the SQLite3 database filename to contain the
+          # innovation statistics attributes for the respective
+          # variable.
+          database_sql_path: outputs/soca_ice.ice_thickness.sql          
+
+
