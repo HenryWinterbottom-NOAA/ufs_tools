@@ -1,8 +1,6 @@
 # =========================================================================
 
-# $$$ MODULE DOCUMENTATION BLOCK
-
-# UFS-RNR-containers :: innov_stats/py/innov_stats/soca_ice.py
+# Module: ush/innov_stats/soca_ice.py
 
 # Author: Henry R. Winterbottom
 
@@ -23,43 +21,49 @@
 Module
 ------
 
-   soca_ice.py
+    soca_ice.py
 
 Description
 -----------
 
-   This module contains the base-class module for all Sea-ice and
-   Ocean Analysis (SOCA) ice innovation statistics diagnostics.
+    This module contains the base-class module for all Sea-ice and
+    Ocean Analysis (SOCA) ice innovation statistics diagnostics.
 
 Classes
 -------
 
-   SOCAIce(yaml_file, basedir)
+    SOCAIce(options_obj, basedir)
 
-       This is the base-class object for all Sea-ice and Ocean
-       Analysis (SOCA) ice innovation statistics diagnostics; it is a
-       sub-class of InnovStats.
+        This is the base-class object for all Sea-ice and Ocean
+        Analysis (SOCA) ice innovation statistics diagnostics; it is a
+        sub-class of InnovStats.
 
 Author(s)
 ---------
 
-   Henry R. Winterbottom; 03 August 2022
+    Henry R. Winterbottom; 28 January 2023
 
 History
 -------
 
-   2022-08-03: Henry Winterbottom -- Initial implementation.
+    2023-01-28: Henry Winterbottom -- Initial implementation.
 
 """
 
 # ----
 
-import numpy
+# pylint: disable=eval-used
+# pylint: disable=too-many-locals
 
+# ----
+
+from dataclasses import dataclass
+
+import numpy
 from ioapps import netcdf4_interface
-from innov_stats import InnovStats
-from innov_stats import InnovStatsError
 from tools import parser_interface
+
+from innov_stats import InnovStats
 
 # ----
 
@@ -70,6 +74,7 @@ __email__ = "henry.winterbottom@noaa.gov"
 # ----
 
 
+@dataclass
 class SOCAIce(InnovStats):
     """
     Description
@@ -82,10 +87,10 @@ class SOCAIce(InnovStats):
     Parameters
     ----------
 
-    yaml_file: str
+    options_obj: object
 
-        A Python string specifying the path to the user experiment
-        configuration file.
+        A Python object containing the command line argument
+        attributes.
 
     basedir: str
 
@@ -94,7 +99,7 @@ class SOCAIce(InnovStats):
 
     """
 
-    def __init__(self, yaml_file, basedir):
+    def __init__(self, options_obj: object, basedir: str):
         """
         Description
         -----------
@@ -104,13 +109,20 @@ class SOCAIce(InnovStats):
         """
 
         # Define the base-class attributes.
-        super(SOCAIce, self).__init__(yaml_file=yaml_file,
-                                      basedir=basedir)
-        self.column_frmt = 'surface_%03d'
+        super().__init__(options_obj=options_obj, basedir=basedir)
+
+        # Define the SOCA ice application innovation statistic
+        # attributes.
+        self.column_frmt = "surface_%03d"
         self.column_scale = 1.0
         self.levels_obj = parser_interface.object_setattr(
-            object_in=self.levels_obj, key='layer_mean',
-            value=[1])
+            object_in=self.levels_obj, key="layer_mean", value=[1]
+        )
+
+        # Initialize the netCDF-formatted output file attributes.
+        (self.ncdim_obj, self.ncvar_obj) = [
+            parser_interface.object_define() for i in range(2)
+        ]
 
     def regional_stats(self, ncfilename, innovinfo_obj):
         """
@@ -140,49 +152,77 @@ class SOCAIce(InnovStats):
 
         """
 
-        # Loop through each region of interest and proceed
-        # accordingly.
+        # Loop through each region of interest to compute the
+        # respective innovation statistics; proceed accordingly.
         for region in vars(self.regions_obj):
-            msg = ('Computing innovation statistics for region {0}.'.
-                   format(region))
-            self.logger.info(msg=msg)
 
             # Determine the observation locations that are valid for
-            # the respective region of interest.
+            # the specified region of interest.
+            msg = f"Computing innovation statistics for region {region}."
+            self.logger.info(msg=msg)
 
-            obslocs = self.get_obslocs(ncfilename=ncfilename,
-                                       innovinfo_obj=innovinfo_obj,
-                                       region=region)
-            qc = netcdf4_interface.ncreadvar(ncfile=ncfilename,
-                                             ncvarname=innovinfo_obj.ncqc)
-            qcchk = numpy.logical_and(qc[obslocs] == 0, qc[obslocs] <= 0)
+            obslocs = self.get_obslocs(
+                ncfilename=ncfilename, innovinfo_obj=innovinfo_obj, region=region
+            )
 
-            # Define/compute the innovation statistics for the region
-            # of interest.
-            omf = netcdf4_interface.ncreadvar(ncfile=ncfilename,
-                                              ncvarname=innovinfo_obj.ncomf)
+            # Quality check the respective observation locations;
+            # proceed accordingly.
+            qcval = netcdf4_interface.ncreadvar(
+                ncfile=ncfilename, ncvarname=innovinfo_obj.ncqc
+            )
+            qcchk = numpy.logical_and(qcval[obslocs] == 0, qcval[obslocs] <= 0)
+
+            # Collect the diagnostic variable "first-guess" values and
+            # quality check accordingly.
+            omf = netcdf4_interface.ncreadvar(
+                ncfile=ncfilename, ncvarname=innovinfo_obj.ncomf
+            )
             omf = omf[obslocs]
             omf = omf[qcchk]
+
+            # Compute the innovation statistics for the respective
+            # region.
             (bias, count, rmsd) = [numpy.empty(1) for i in range(3)]
+
             bias[:] = numpy.mean(omf[:])
             count[:] = numpy.ma.count(omf[:])
-            rmsd[:] = numpy.sqrt(numpy.mean(omf[:]*omf[:]))
+            rmsd[:] = numpy.sqrt(numpy.mean(omf[:] * omf[:]))
+
+            # Define that geographical attributes describing the
+            # respective region.
             region_info_dict = parser_interface.object_getattr(
-                object_in=self.regions_obj, key=region)
-            (lat_min, lat_max, lon_min, lon_max) = [region_info_dict[region_thresh] for
-                                                    region_thresh in ['lat_min', 'lat_max',
-                                                                      'lon_min', 'lon_max']]
+                object_in=self.regions_obj, key=region
+            )
+            (lat_min, lat_max, lon_min, lon_max) = [
+                region_info_dict[region_thresh]
+                for region_thresh in ["lat_min", "lat_max", "lon_min", "lon_max"]
+            ]
 
             # Loop through all innovation statistic attributes and
             # update the base-class netCDF object accordingly.
-            attrs_dict = {'lat_min': lat_min, 'lat_max': lat_max, 'lon_min': lon_min,
-                          'lon_max': lon_max, }
+            attrs_dict = {
+                "lat_min": lat_min,
+                "lat_max": lat_max,
+                "lon_min": lon_min,
+                "lon_max": lon_max,
+            }
+
+            # Loop through all innovation statistic attributes and
+            # update the base-class netCDF object accordingly.
             for stat in self.stats_type_list:
-                ncvar_dict = {'{0}_{1}'.format(stat, region):
-                              {'varname': '{0}_{1}'.format(stat, region),
-                               'dims': 'surface', 'type': 'float64', 'values': eval(stat),
-                               'attrs': attrs_dict}}
-                self.update_ncvar(ncvar_dict=ncvar_dict)
+                ncvar_dict = {
+                    f"{stat}_{region}": {
+                        "varname": f"{stat}_{region}",
+                        "dims": "surface",
+                        "type": "float64",
+                        "values": eval(stat),
+                        "attrs": attrs_dict,
+                    }
+                }
+
+                self.ncvar_obj = self.update_ncvar(
+                    ncvar_dict=ncvar_dict, ncvar_obj=self.ncvar_obj
+                )
 
     def run(self):
         """
@@ -209,28 +249,72 @@ class SOCAIce(InnovStats):
             database file path.
 
         """
-        self.build_database(column_frmt=self.column_frmt,
-                            levels_list=self.levels_obj.layer_mean,
-                            column_scale=self.column_scale)
+
+        # Initialize the SQLite3 database and tables; proceed
+        # accordingly.
+        self.build_database(
+            column_frmt=self.column_frmt,
+            levels_list=self.levels_obj.layer_mean,
+            column_scale=self.column_scale,
+        )
+
+        # Compute the innovation statistics for each specified
+        # diagnostics variable in the experiment configuration.
         for diagsvar in self.diagsvars:
-            (self.ncdim_obj, self.ncvar_obj) = \
-                [parser_interface.object_define() for i in range(2)]
+
+            # Collect the attributes for the respective diagnostic
+            # variable.
             vardict = parser_interface.object_getattr(
-                object_in=self.diagsinfo_obj, key=diagsvar)
+                object_in=self.diagsinfo_obj, key=diagsvar
+            )
             innovinfo_obj = self.get_innovinfo(
-                vardict=vardict, addinfo_list=['ncomf', 'ncqc'])
-            ncfilename = self.get_ncfilename(vardict=vardict, ncdim='nlocs')
-            if ncfilename is None:
-                pass
+                vardict=vardict, addinfo_list=["ncomf", "ncqc"]
+            )
+
+            # Update the base-class object containing the
+            # respective netCDF variable attributes.
+            dimsdict = {
+                "surface": {
+                    "size": len(self.levels_obj.layer_mean),
+                    "type": "float32",
+                    "values": self.levels_obj.layer_mean,
+                }
+            }
+
+            self.ncvar_obj = self.build_ncdims(
+                dimsdict=dimsdict, ncvar_obj=self.ncvar_obj
+            )
+
+            # Define netCDF-formatted file path containing the
+            # respective diagnostics variable; proceed accordingly.
+            ncfilename = self.get_ncfilename(vardict=vardict, ncdim="nlocs")
+
             if ncfilename is not None:
+
+                # Update the base-class object containing the
+                # respective netCDF variable dimension attributes.
                 self.ncdim_obj = parser_interface.object_setattr(
-                    object_in=self.ncdim_obj, key='surface', value=1)
-                dimsdict = {'surface': {'size': len(self.levels_obj.layer_mean),
-                                        'type': 'float32',
-                                        'values': self.levels_obj.layer_mean}}
-                self.build_ncdims(dimsdict=dimsdict)
-                self.regional_stats(ncfilename=ncfilename,
-                                    innovinfo_obj=innovinfo_obj)
-                self.write_ncout(vardict=vardict, variable=diagsvar,
-                                 ncdim_obj=self.ncdim_obj, ncvar_obj=self.ncvar_obj)
-                self.write_database(vardict=vardict, variable=diagsvar)
+                    object_in=self.ncdim_obj, key="surface", value=1
+                )
+
+                # Compute the respective diagnostic variables
+                # innovation statistics as a function of the region(s)
+                # specified in the experiment configuration.
+                self.regional_stats(ncfilename=ncfilename, innovinfo_obj=innovinfo_obj)
+
+                # Write the netCDF-formatted file for the respective
+                # diagnostics variable and write/update the SQLite3
+                # database table(s) for the respective diagnostics
+                # variable.
+                self.write_ncout(
+                    vardict=vardict,
+                    variable=diagsvar,
+                    ncdim_obj=self.ncdim_obj,
+                    ncvar_obj=self.ncvar_obj,
+                )
+                self.write_database(
+                    vardict=vardict,
+                    variable=diagsvar,
+                    column_frmt=self.column_frmt,
+                    column_scale=self.column_scale,
+                )
