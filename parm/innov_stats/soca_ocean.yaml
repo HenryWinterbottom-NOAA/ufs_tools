@@ -84,12 +84,12 @@ diagsinfo:
 
           # Define the input SOCA netCDF filename; POSIX compliant
           # time-stamp templating is permitted.
-          ncinfile: innov_stats_demo/profile_hgodas_salinity.SOCA.3dvar.%Y%m%d%H%M%S.nc, innov_stats_demo/profile_wod_salinity.SOCA.3dvar.%Y%m%d%H%M%S.nc
+          ncinfile: inputs/profile_hgodas_salinity.SOCA.3dvar.%Y%m%d%H%M%S.nc, inputs/profile_wod_salinity.SOCA.3dvar.%Y%m%d%H%M%S.nc
 
           # Define the netCDF filename to contain the output
           # innovation variable fields; POSIX compliant time-stamp
           # templating is permitted.
-          ncoutfile: ./outputs/innov_stats.salinity.%Y%m%d%H%M%S.nc
+          ncoutfile: outputs/innov_stats.salinity.%Y%m%d%H%M%S.nc
           
           # Define the time offset, if applicable, for the netCDF file
           # timestamp; units are seconds.
@@ -118,7 +118,7 @@ diagsinfo:
           # Define the SQLite3 database filename to contain the
           # innovation statistics attributes for the respective
           # variable.
-          database_sql_path: ./outputs/soca_insitudiags.salinity.sql
+          database_sql_path: outputs/soca_insitudiags.salinity.sql
 
      # Define the temperature variable observation diagnostics
      # information.
@@ -126,12 +126,12 @@ diagsinfo:
 
           # Define the input SOCA netCDF filename; POSIX compliant
           # time-stamp templating is permitted.
-          ncinfile: innov_stats_demo/profile_hgodas_temperature.SOCA.3dvar.%Y%m%d%H%M%S.nc, innov_stats_demo/profile_wod_temperature.SOCA.3dvar.%Y%m%d%H%M%S.nc
+          ncinfile: inputs/profile_hgodas_temperature.SOCA.3dvar.%Y%m%d%H%M%S.nc, inputs/profile_wod_temperature.SOCA.3dvar.%Y%m%d%H%M%S.nc
 
           # Define the netCDF filename to contain the output
           # innovation variable fields; POSIX compliant time-stamp
           # templating is permitted.
-          ncoutfile: ./outputs/innov_stats.temperature.%Y%m%d%H%M%S.nc
+          ncoutfile: outputs/innov_stats.temperature.%Y%m%d%H%M%S.nc
           
           # Define the time offset, if applicable, for the netCDF file
           # timestamp; units are seconds.
@@ -160,5 +160,5 @@ diagsinfo:
           # Define the SQLite3 database filename to contain the
           # innovation statistics attributes for the respective
           # variable.
-          database_sql_path: ./outputs/soca_insitudiags.temperature.sql
+          database_sql_path: outputs/soca_insitudiags.temperature.sql
 
