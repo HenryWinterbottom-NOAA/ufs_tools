@@ -128,6 +128,9 @@ class GSIAtmos(InnovStats):
             parser_interface.object_define() for i in range(2)
         ]
 
+        # Define the total number of vertical levels.
+        self.nlevs = len(self.levels_obj.layer_mean)
+
     def compute_innovstat(
         self,
         innovinfo_obj: object,
@@ -407,7 +410,8 @@ class GSIAtmos(InnovStats):
 
         # Read the necessary values from the netCDF-formatted file.
         innovinfo_obj = self.get_innovinfo(
-            vardict=vardict, addinfo_list=["ncobstype", "ncpres", "ncomf", "ncuse"]
+            vardict=vardict, addinfo_list=[
+                "ncobstype", "ncpres", "ncomf", "ncuse"]
         )
 
         omf = netcdf4_interface.ncreadvar(
@@ -668,10 +672,12 @@ class GSIAtmos(InnovStats):
             if is_wind:
                 obslocs = numpy.logical_and(ncobstype >= 280, ncobstype <= 282)
                 obslocs = numpy.logical_or(
-                    obslocs, numpy.logical_or(ncobstype == 220, ncobstype == 221)
+                    obslocs, numpy.logical_or(
+                        ncobstype == 220, ncobstype == 221)
                 )
                 obslocs = numpy.logical_or(
-                    obslocs, numpy.logical_and(ncobstype >= 230, ncobstype <= 235)
+                    obslocs, numpy.logical_and(
+                        ncobstype >= 230, ncobstype <= 235)
                 )
 
             obslocs = numpy.logical_and(obslocs, usage)
