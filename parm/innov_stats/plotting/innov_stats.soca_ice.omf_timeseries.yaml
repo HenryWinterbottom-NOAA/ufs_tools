@@ -1,0 +1,189 @@
+# Define the innovation statistics application; the following are
+# currently supported.
+
+# gsi_atmos_omfprofile: Gridpoint Statistical Interpolation (GSI)
+#                       atmosphere innovation statistic profile.
+
+# gsi_atmos_omftimeseries: Gridpoint Statistical Interpolation (GSI)
+#                          atmosphere innovation statistic timeseries.
+
+# soca_ice_omftimeseries: Sea-ice and Ocean Analysis (SOCA) ice
+#                         innovation statistic timeseries.
+
+# soca_ocean_omfprofile: Sea-ice and Ocean Analysis (SOCA) ocean
+#                        innovation statistic profile.
+
+# soca_ocean_omftimeseries: Sea-ice and Ocean Analysis (SOCA) ocean
+#                           innovation statistic timeseries.
+innov_stats_app: soca_ice_omftimeseries
+
+#----
+
+# Define the forecast cycle information.
+cycles:
+
+     # Define the first forecast cycle of interest; this timestamp is
+     # to be formatted as (assuming the UNIX POSIX convention as
+     # %Y-%m-%d_%H:%M:%S.
+     cycle_start: "2019-05-01_12:00:00"
+
+     # Define the last forecast cycle of interest; this timestamp is
+     # to be formatted as (assuming the UNIX POSIX convention)
+     # %Y-%m-%d_%H:%M:%S.
+     cycle_stop: "2020-04-01_12:00:00"
+
+     # Define the forecast cycle interval; units are seconds.
+     cycle_interval: 86400
+
+#----
+
+# Define the levels for which the time-series is to be plotted; for
+# SOCA ice applications this should not be changed; unitless.
+levels: 1
+
+# Define the valid Python matplotlib color map name to be used to plot
+# the respective levels for the time-series; a comprehensive list can
+# be found here:
+# https://matplotlib.org/stable/tutorials/colors/colormaps.html
+colormap: jet
+
+#----
+
+# Define the experiments to be plotted.
+experiments:
+     
+     # Define the respective experiment.
+     soca:
+
+          # Define the top-level data path containing the innovation
+          # statistics files for the respective experiment.
+          datapath: /Users/henry.winterbottom/trunk/UFS-RNR-analysis/containers/apps/innov_stats/py
+
+          # Define the variable attributes; these designate which
+          # files are to be collected from the datapath specified
+          # above.
+          variables:
+
+               # The ice thickness observation innovation statistic
+               # diagnostics.
+               thickness:
+
+                    # Define the SQLite3 file basename containing the
+                    # respective variable innovation statistic.
+                    filename: soca_ice.ice_thickness.sql               
+
+#----
+               
+# Define the variables to be plotted.
+variables:
+
+     # Specify whether to generate PNG formatted figures for each
+     # variable innovation statistics; if True, the format will be
+     # <region name>.<innovation statistic>.<variable name>.png and
+     # will be written to the base-directory.
+     create_images: True
+
+     # The ice thickness observation innovation statistic diagnostics.
+     thickness:
+
+          # Define the bias statistic attributes.
+          bias:
+
+               # Define the axes attributes for the figure.
+               axes:
+                    xbuffer: True
+                    xrotation: -90.0
+                    xfontsize: 6
+                    xint: 10
+                    ymin: -0.25
+                    ymax: 0.25
+                    yint: 0.05
+
+               # Define the zero-line relative to bias profile.
+               hlines:
+                    y: 0.0
+                    colors: black
+                    linestyles: dashed
+                    linewidth: 0.5
+
+               # Define the line attributes for the figure.
+               lines:
+                    linestyle: solid
+                    linewidth: 0.5
+                    color: red
+
+               # Define the saved figure attributes.
+               savefig:
+                    bbox_inches: tight
+                    dpi: 500
+                    transparent: False
+
+               # Define the x-axis label.
+               ylabel:
+                    ylabel: 'Ice Thickness Bias'
+                    horizontalalignment: center
+
+          # Define the root mean squared difference statistic
+          # attributes.
+          rmsd:
+
+               # Define the axes attributes for the figure.
+               axes:
+                    xbuffer: True
+                    xrotation: -90.0
+                    xfontsize: 6
+                    xint: 10
+                    ymin: 0.0
+                    ymax: 0.3
+                    yint: 0.05
+
+               # Define the line attributes for the figure.
+               lines:
+                    linestyle: solid
+                    linewidth: 0.5
+                    color: red
+
+               # Define the saved figure attributes.
+               savefig:
+                    bbox_inches: tight
+                    dpi: 500
+                    transparent: False
+
+               # Define the x-axis label.
+               ylabel:
+                    ylabel: 'Ice Thickness RMSD'
+                    horizontalalignment: center
+
+#----
+
+# Define the region attributes for the respective experiments.
+regions:
+
+     # Define the attributes for the Northern Pole region.
+     north_pole:
+
+          # Define the title attributes for the respective region
+          # plot.
+          title:
+               s: "Northern Polar Region Innovation Statistics"
+
+     # Define the attributes for the Southern Pole region.
+     south_pole:
+
+          # Define the title attributes for the respective region
+          # plot.
+          title:
+               s: "Southern Polar Region Innovation Statistics"
+
+     # Define the attributes for the Global region.
+     global:
+
+          # Define the title attributes for the respective region
+          # plot.
+          title:
+               s: "Global Innovation Statistics"
+
+
+
+
+

@@ -1,0 +1,345 @@
+# Define the innovation statistics application; the following are
+# currently supported.
+
+# gsi_atmos_omfprofile: Gridpoint Statistical Interpolation (GSI)
+#                       atmosphere innovation statistic profile.
+
+# gsi_atmos_omftimeseries: Gridpoint Statistical Interpolation (GSI)
+#                          atmosphere innovation statistic timeseries.
+
+# soca_ice_omftimeseries: Sea-ice and Ocean Analysis (SOCA) ice
+#                         innovation statistic timeseries.
+
+# soca_ocean_omfprofile: Sea-ice and Ocean Analysis (SOCA) ocean
+#                        innovation statistic profile.
+
+# soca_ocean_omftimeseries: Sea-ice and Ocean Analysis (SOCA) ocean
+#                           innovation statistic timeseries.
+innov_stats_app: soca_ocean_omftimeseries
+
+#----
+
+# Define the forecast cycle information.
+cycles:
+
+     # Define the first forecast cycle of interest; this timestamp is
+     # to be formatted as (assuming the UNIX POSIX convention as
+     # %Y-%m-%d_%H:%M:%S.
+     cycle_start: "2019-05-01_12:00:00"
+
+     # Define the last forecast cycle of interest; this timestamp is
+     # to be formatted as (assuming the UNIX POSIX convention)
+     # %Y-%m-%d_%H:%M:%S.
+     cycle_stop: "2020-04-01_12:00:00"
+
+     # Define the forecast cycle interval; units are seconds.
+     cycle_interval: 86400
+
+#----
+
+# Define the depth levels for which the time-series is to be plotted;
+# these values me be either the depth levels within the respective
+# database table or levels specified by the user; the latter will use
+# a weighted average of the levels bounding that specified by the
+# user; units are meters.
+#levels: 2.5, 7.5, 15.0, 25.0, 35.0, 45.0, 55.0, 65.0, 75.0, 85.0, 95.0, 112.5, 137.5, 167.5, 187.5, 212.5, 237.5, 267.5, 287.5, 325.0, 375.0, 425.0, 475.0
+levels: 50.0, 100.0, 150.0, 200.0, 250.0, 300.0, 350.0, 400.0, 450.0, 600.0
+
+# Define the valid Python matplotlib color map name to be used to plot
+# the respective levels for the time-series; a comprehensive list can
+# be found here:
+# https://matplotlib.org/stable/tutorials/colors/colormaps.html
+colormap: jet
+
+#----
+
+# Define the experiments to be plotted.
+experiments:
+     
+     # Define the respective experiment.
+     soca:
+
+          # Define the top-level data path containing the innovation
+          # statistics files for the respective experiment.
+          datapath: /Users/henry.winterbottom/trunk/UFS-RNR-analysis/containers/apps/innov_stats/py
+
+          # Define the plotting attributes for the respective
+          # experiment.
+#          plotting:
+          
+               # Define the experiment label; this is used for legend
+               # annotation.
+#               label: "SOCA Experiment"
+
+               # Define the experiment color.
+#               color: red
+
+          # Define the variable attributes; these designate which
+          # files are to be collected from the datapath specified
+          # above.
+          variables:
+
+               # The salinity observation innovation statistic
+               # diagnostics.
+               salinity:
+
+                    # Define the SQLite3 file basename containing the
+                    # respective variable innovation statistic.
+                    filename: soca_ocean.salinity.sql
+               
+               # The temperature observation innovation statistic
+               # diagnostics.
+               temperature:
+                    
+                    # Define the SQLite3 file basename containing the
+                    # respective variable innovation statistic.
+                    filename: soca_ocean.temperature.sql
+
+#----
+               
+# Define the variables to be plotted.
+variables:
+
+     # Specify whether to generate PNG formatted figures for each
+     # variable innovation statistics; if True, the format will be
+     # <region name>.<innovation statistic>.<variable name>.png and
+     # will be written to the base-directory.
+     create_images: True
+
+     # The salinity observation innovation statistic diagnostics.
+     salinity:
+
+          # Define the bias statistic attributes.
+          bias:
+
+               # Define the axes attributes for the figure.
+               axes:
+                    xbuffer: True
+                    xrotation: -90.0
+                    xfontsize: 6
+                    xint: 20
+                    ymin: -0.1
+                    ymax: 0.1
+                    yint: 0.05
+
+               # Define the zero-line relative to bias profile.
+               hlines:
+                    y: 0.0
+                    colors: black
+                    linestyles: dashed
+                    linewidth: 0.5
+
+               # Define the legend attributes for the figure.
+               legend:
+                    title: 'Depth (m)'
+                    loc: 'center right'
+                    fancybox: Null
+                    edgecolor: Null
+                    framealpha: Null
+                    shadow: Null
+                    fontsize: 'x-small'
+                    facecolor: Null
+                    ncol: 2
+                    bbox_to_anchor: [1.3, 0.5]
+
+               # Define the line attributes for the figure.
+               lines:
+                    linestyle: solid
+                    linewidth: 0.5
+
+               # Define the saved figure attributes.
+               savefig:
+                    bbox_inches: tight
+                    dpi: 500
+                    transparent: False
+
+               # Define the x-axis label.
+               ylabel:
+                    ylabel: 'Salinity Bias (PPT)'
+                    horizontalalignment: center
+
+          # Define the root mean squared difference statistic
+          # attributes.
+          rmsd:
+
+               # Define the axes attributes for the figure.
+               axes:
+                    xbuffer: True
+                    xrotation: -90.0
+                    xfontsize: 6
+                    xint: 20
+                    ymin: 0.0
+                    ymax: 0.5
+                    yint: 0.1
+                    
+               # Define the legend attributes for the figure.
+               legend:
+                    title: 'Depth (m)'
+                    loc: 'center right'
+                    fancybox: Null
+                    edgecolor: Null
+                    framealpha: Null
+                    shadow: Null
+                    fontsize: 'x-small'
+                    facecolor: Null
+                    ncol: 2
+                    bbox_to_anchor: [1.3, 0.5]
+
+               # Define the line attributes for the figure.
+               lines:
+                    linestyle: solid
+                    linewidth: 0.5
+
+               # Define the saved figure attributes.
+               savefig:
+                    bbox_inches: tight
+                    dpi: 500
+                    transparent: False
+
+               # Define the x-axis label.
+               ylabel:
+                    ylabel: 'Salinity RMSD (PPT)'
+                    horizontalalignment: center
+
+     # The temperature observation innovation statistic diagnostics.
+     temperature:
+
+          # Define the bias statistic attributes.
+          bias:
+
+               # Define the axes attributes for the figure.
+               axes:
+                    xbuffer: True
+                    xrotation: -90.0
+                    xfontsize: 6
+                    xint: 20
+                    ymin: -0.3
+                    ymax: 0.5
+                    yint: 0.1
+  
+               # Define the zero-line relative to bias profile.
+               hlines:
+                    y: 0.0
+                    colors: black
+                    linestyles: dashed
+                    linewidth: 0.5
+
+               # Define the legend attributes for the figure.
+               legend:
+                    title: 'Depth (m)'
+                    loc: 'center right'
+                    fancybox: Null
+                    edgecolor: Null
+                    framealpha: Null
+                    shadow: Null
+                    fontsize: 'x-small'
+                    facecolor: Null
+                    ncol: 2
+                    bbox_to_anchor: [1.3, 0.5]
+
+               # Define the line attributes for the figure.
+               lines:
+                    linestyle: solid
+                    linewidth: 0.5
+
+               # Define the saved figure attributes.
+               savefig:
+                    bbox_inches: tight
+                    dpi: 500
+                    transparent: False
+
+               # Define the axis labels.
+               ylabel:
+                    ylabel: 'Temperature Bias (K)'
+                    horizontalalignment: center
+
+          # Define the root mean squared difference statistic
+          # attributes.
+          rmsd:
+
+               # Define the axes attributes for the figure.
+               axes:
+                    xbuffer: True
+                    xrotation: -90.0
+                    xfontsize: 6
+                    xint: 20
+                    ymin: 0.0
+                    ymax: 1.75
+                    yint: 0.25
+
+               # Define the legend attributes for the figure.
+               legend:
+                    title: 'Depth (m)'
+                    loc: 'center right'
+                    fancybox: Null
+                    edgecolor: Null
+                    framealpha: Null
+                    shadow: Null
+                    fontsize: 'x-small'
+                    facecolor: Null
+                    ncol: 2
+                    bbox_to_anchor: [1.3, 0.5]
+
+               # Define the line attributes for the figure.
+               lines:
+                    linestyle: solid
+                    linewidth: 0.5
+
+               # Define the saved figure attributes.
+               savefig:
+                    bbox_inches: tight
+                    dpi: 500
+                    transparent: False
+
+               # Define the y-axis label.
+               ylabel:
+                    ylabel: 'Temperature RMSD (K)'
+                    horizontalalignment: center
+
+#----
+
+# Define the region attributes for the respective experiments.
+regions:
+
+     # Define the attributes for the Equatorial region.
+     equatorial:
+
+          # Define the title attributes for the respective region
+          # plot.
+          title:
+               s: "Equatorial Region Innovation Statistics"
+
+     # Define the attributes for the Global region.
+     global:
+
+          # Define the title attributes for the respective region
+          # plot.
+          title:
+               s: "Global Innovation Statistics"
+
+     # Define the attributes for the Northern Hemisphere region.
+     north_hemis:
+          
+          # Define the title attributes for the respective region
+          # plot.
+          title:
+               s: "Northern Hemisphere Innovation Statistics"
+
+     # Define the attributes for the Tropics region.
+     tropics:
+
+          # Define the title attributes for the respective region
+          # plot.
+          title:
+               s: "Tropical Region Innovation Statistics"
+
+     # Define the attributes for the Southern Hemisphere region.
+     south_hemis:
+
+          # Define the title attributes for the respective region
+          # plot.
+          title:
+               s: "Southern Hemisphere Innovation Statistics"
+
+
+
