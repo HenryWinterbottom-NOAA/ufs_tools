@@ -93,7 +93,9 @@ RUN apt-get update -y && \
 
 # ----
 
-RUN /miniconda/bin/conda install xarray==0.16.2 && \
+RUN /miniconda/bin/pip install pip --upgrade && \
+    /miniconda/bin/pip install pyopenssl --upgrade && \
+    /miniconda/bin/conda install xarray==0.16.2 && \
     /miniconda/bin/pip install pygrib && \
     /miniconda/bin/conda install -c conda-forge xesmf && \
     /miniconda/bin/conda install -c conda-forge gridfill && \
