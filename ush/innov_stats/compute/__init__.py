@@ -144,10 +144,10 @@ class InnovStats:
 
         # Collect the relevant information from the experiment
         # configuration.
-        self.diagsinfo_obj = parser_interface.object_define()
+        (self.diagsinfo_obj, self.levels_obj) = [
+            parser_interface.object_define() for idx in range(2)]
         self.regions_obj = self.get_regions()
         self.diagsvars = self.get_diagsinfo()
-        self.levels_obj = parser_interface.object_define()
 
     def build_database(
         self, column_frmt: str, levels_list: list = None, column_scale: float = 1.0
@@ -266,7 +266,8 @@ class InnovStats:
 
                     if levels_list is not None:
                         for level in levels_list:
-                            table_dict[column_frmt % int(level * column_scale)] = "REAL"
+                            table_dict[column_frmt %
+                                       int(level * column_scale)] = "REAL"
 
                     # Create the SQLite3 database table.
                     sqlite3_interface.create_table(
@@ -390,7 +391,8 @@ class InnovStats:
         # bottom layer interfaces for the respective level) as well as
         # the mean value for the respective interval (i.e., the layer
         # mean -- the middle of the layer).
-        levels_attr_dict = {"depth_bottom": "layer_bottom", "depth_top": "layer_top"}
+        levels_attr_dict = {
+            "depth_bottom": "layer_bottom", "depth_top": "layer_top"}
         for (levels_attr, _) in levels_attr_dict.items():
             value = parser_interface.dict_key_value(
                 dict_in=depth_levels_dict, key=levels_attr, force=True
@@ -1040,8 +1042,7 @@ class InnovStats:
         Description
         -----------
 
-        This method updates the base-class netCDF variable object
-        (ncvar_obj).
+        This method updates the netCDF variable object (ncvar_obj).
 
         Parameters
         ----------

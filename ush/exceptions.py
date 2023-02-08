@@ -31,11 +31,25 @@ Description
 Classes
 -------
 
+    ESMFRemappingError()
+
+        This is the base-class for exceptions encountered within the
+        ush/esmf_remapping module; it is a sub-class of Error.
+
+    GridSpecError()
+
+        This is the base-class for exceptions encountered within the
+        ush/gridspec module; it is a sub-class of Error.
+
     InnovStatsComputeError()
 
         This is the base-class for exceptions encountered within the
         ush/innov_stats/compute module; it is a sub-class of Error.
 
+Requirements
+------------
+
+- ufs_pytils; https://github.com/HenryWinterbottom-NOAA/ufs_pyutils
 
 Author(s)
 ---------
@@ -56,15 +70,41 @@ from utils.error_interface import Error
 # ----
 
 # Define all available attributes.
-__all__ = [
-    "InnovStatsComputeError"
-]
+__all__ = ["ESMFRemappingError", "GridSpecError", "InnovStatsComputeError"]
 
 # ----
 
 __author__ = "Henry R. Winterbottom"
 __maintainer__ = "Henry R. Winterbottom"
 __email__ = "henry.winterbottom@noaa.gov"
+
+# ----
+
+
+class ESMFRemappingError(Error):
+    """
+    Description
+    -----------
+
+    This is the base-class for exceptions encountered within the
+    ush/esmf_remapping module; it is a sub-class of Error.
+
+    """
+
+
+# ----
+
+
+class GridSpecError(Error):
+    """
+    Description
+    -----------
+
+    This is the base-class for exceptions encountered within the
+    ush/gridspec module; it is a sub-class of Error.
+
+    """
+
 
 # ----
 

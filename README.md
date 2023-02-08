@@ -34,6 +34,9 @@ obtain the entire system, do as follows.
 user@host:$ git clone https://github.com/HenryWinterbottom-NOAA/ufs_tools
 ~~~
 
+A description of the respective applications may be found
+[here](./APPLICATIONS.md).
+
 # Forking
 
 If a user wishes to contribute modifications done within their
