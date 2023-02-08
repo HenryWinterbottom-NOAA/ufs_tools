@@ -110,14 +110,46 @@ class ArakawaC(GridSpec):
 
         # Define the reduced grid variable attributes.
         self.reduce_grid_dict = {
-            "qlat": ["nyp", "nxp"],
-            "qlon": ["nyp", "nxp"],
-            "tlat": ["ny", "nx"],
-            "tlon": ["ny", "nx"],
-            "ulat": ["ny", "nxp"],
-            "ulon": ["ny", "nxp"],
-            "vlat": ["nyp", "nx"],
-            "vlon": ["nyp", "nx"],
+            "qlat": {
+                "dims": ["nyp", "nxp"],
+                "desc": "Array of q-grid latitudes; degrees north.",
+                "type": "float64",
+            },
+            "qlon": {
+                "dims": ["nyp", "nxp"],
+                "desc": "Array of q-grid longitudes; degrees east.",
+                "type": "float64",
+            },
+            "tlat": {
+                "dims": ["ny", "nx"],
+                "desc": "Array of t-grid latitudes; degrees north.",
+                "type": "float64",
+            },
+            "tlon": {
+                "dims": ["ny", "nx"],
+                "desc": "Array of t-grid longtudes; degrees east.",
+                "type": "float64",
+            },
+            "ulat": {
+                "dims": ["ny", "nxp"],
+                "desc": "Array of u-grid latitudes; degrees north.",
+                "type": "float64",
+            },
+            "ulon": {
+                "dims": ["ny", "nxp"],
+                "desc": "Array of u-grid longitudes; degrees east.",
+                "type": "float64",
+            },
+            "vlat": {
+                "dims": ["nyp", "nx"],
+                "desc": "Array of v-grid latitudes; degrees north.",
+                "type": "float64",
+            },
+            "vlon": {
+                "dims": ["nyp", "nx"],
+                "desc": "Array of v-grid longitudes; degrees east.",
+                "type": "float64",
+            },
         }
 
     def compute_grid(self: GridSpec) -> None:
@@ -125,31 +157,15 @@ class ArakawaC(GridSpec):
         Description
         -----------
 
-        This method defines the Arakawa-C type grid projection from
-        the supergrid structure collected from the specified
-        netCDF-formatted file path; the Arakawa-C grid projection is
-        encapsulated within the base-class object reduce_grid_obj upon
-        exit; the base-class netCDF-formatted output file dimension
-        attributes are defined within the ncdim_obj object upon exit.
+        This method defines the Arakawa-C type reduced grid projection
+        from the supergrid structure collected from the specified
+        netCDF-formatted file path; the Arakawa-C reduced grid
+        projection is encapsulated within the base-class object
+        reduce_grid_obj upon exit; the base-class netCDF-formatted
+        output file dimension attributes are defined within the
+        ncdim_obj object upon exit.
 
         """
-
-        # Define the netCDF grid-coordinate dimensions.
-        nx = (self.grids_obj.mask.ncvalues.shape)[1]
-        self.ncdim_obj = parser_interface.object_setattr(
-            object_in=self.ncdim_obj, key="nx", value=nx
-        )
-        self.ncdim_obj = parser_interface.object_setattr(
-            object_in=self.ncdim_obj, key="nxp", value=(nx + 1)
-        )
-
-        ny = (self.grids_obj.mask.ncvalues.shape)[0]
-        self.ncdim_obj = parser_interface.object_setattr(
-            object_in=self.ncdim_obj, key="ny", value=ny
-        )
-        self.ncdim_obj = parser_interface.object_setattr(
-            object_in=self.ncdim_obj, key="nyp", value=(ny + 1)
-        )
 
         # Define the grid-cell corner point geographical coordinate
         # values using the supergrid.
@@ -160,11 +176,6 @@ class ArakawaC(GridSpec):
         # values using the supergrid.
         tlat = self.grids_obj.latitude.ncvalues[1::2, 1::2]
         tlon = self.grids_obj.longitude.ncvalues[1::2, 1::2]
-
-        # Define the topography grid values; these are defined at the
-        # mass variable geographical grid coordinate values of the
-        # reduced .
-        topog = self.grids_obj.topography.ncvalues[:, :]
 
         # Define the zonal-velocity variable geographical coordinate
         # values using the supergrid.
@@ -184,6 +195,23 @@ class ArakawaC(GridSpec):
                 object_in=self.reduce_grid_obj, key=reduce_grid, value=eval(reduce_grid)
             )
 
+        # Define the netCDF grid-coordinate dimensions.
+        nx = tlon.shape[1]
+        self.ncdim_obj = parser_interface.object_setattr(
+            object_in=self.ncdim_obj, key="nx", value=nx
+        )
+        self.ncdim_obj = parser_interface.object_setattr(
+            object_in=self.ncdim_obj, key="nxp", value=(nx + 1)
+        )
+
+        ny = tlat.shape[0]
+        self.ncdim_obj = parser_interface.object_setattr(
+            object_in=self.ncdim_obj, key="ny", value=ny
+        )
+        self.ncdim_obj = parser_interface.object_setattr(
+            object_in=self.ncdim_obj, key="nyp", value=(ny + 1)
+        )
+
     def prepare_ncfile(self: GridSpec) -> None:
         """
         Description
@@ -198,27 +226,42 @@ class ArakawaC(GridSpec):
 
         # Build the object containing the reduced grid variables to be
         # written to the netCDF-formatted file path.
+        grid_attrs_list = ["desc", "dims", "type"]
+
         for grid_var in list(vars(self.reduce_grid_obj).keys()):
 
             # Define the netCDF variable attributes.
-            dims = parser_interface.dict_key_value(
-                dict_in=self.reduce_grid_dict, key=grid_var, force=True, no_split=True
+            grid_var_obj = parser_interface.object_define()
+
+            grid_attrs_dict = parser_interface.dict_key_value(
+                dict_in=self.reduce_grid_dict, key=grid_var, no_split=True
             )
-            if dims is None:
-                msg = (
-                    "The grid dimension variable names could not be determined "
-                    f"for grid coordinate variable {grid_var}. Aborting!!!"
+
+            for grid_attr in grid_attrs_list:
+                value = parser_interface.dict_key_value(
+                    grid_attrs_dict, key=grid_attr, force=True, no_split=True
                 )
-                raise GridSpecError(msg=msg)
+
+                if value is None:
+                    msg = (
+                        f"The attribute {grid_attr} for grid type {grid_var} "
+                        "has not been defined. Aborting!!!"
+                    )
+                    raise GridSpecError(msg=msg)
+
+                grid_var_obj = parser_interface.object_setattr(
+                    object_in=grid_var_obj, key=grid_attr, value=value
+                )
 
             ncvar_dict = {
                 grid_var: {
                     "varname": grid_var,
-                    "dims": dims,
-                    "type": "float64",
+                    "dims": grid_var_obj.dims,
+                    "type": grid_var_obj.type,
                     "values": parser_interface.object_getattr(
                         self.reduce_grid_obj, key=grid_var
                     ),
+                    "attrs": {"description": grid_var_obj.desc},
                 }
             }
 

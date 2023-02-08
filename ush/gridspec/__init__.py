@@ -67,7 +67,8 @@ import numpy
 from confs.yaml_interface import YAML
 from exceptions import GridSpecError
 from ioapps import netcdf4_interface
-from tools import fileio_interface, parser_interface
+from tools import datetime_interface, fileio_interface, parser_interface
+from utils import timestamp_interface
 from utils.logger_interface import Logger
 
 # ----
@@ -303,6 +304,13 @@ class GridSpec:
             )
             self.logger.warn(msg=msg)
 
+        # Define the global attributes for the netCDF-formatted file.
+        glbattrs_dict = {
+            "_FillValue": numpy.nan,
+            "date": datetime_interface.current_date(timestamp_interface.INFO),
+            "created": str(parser_interface.enviro_get(envvar="HOSTNAME")),
+        }
+
         # Write the netCDF-formatted file.
         msg = f"Writing reduced to path {ncfile}."
         self.logger.info(msg=msg)
@@ -311,6 +319,7 @@ class GridSpec:
             ncdim_obj=self.ncdim_obj,
             ncvar_obj=self.ncvar_obj,
             ncfrmt="NETCDF4",
+            glbattrs_dict=glbattrs_dict,
         )
 
     def run(self) -> None:
