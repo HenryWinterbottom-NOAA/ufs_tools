@@ -15,7 +15,7 @@ YAML-formatted configurtaion files, must be defined relative to the
 Docker container directory tree. See the examples throughout for
 additional detail.
 
-## Gridspec
+## GridSpec
 
 The `gridspec` application provides an interface for generating
 [gridspec](https://arxiv.org/pdf/1911.08638.pdf) formatted
@@ -47,3 +47,8 @@ user@host:$ python compute_gridspec.py --yaml_file=/path/to/gridspec/yaml
 
 Note that the `yaml_file` attribute path is relative to the Docker
 container directory tree.
+
+#
+
+Please direct questions to [Henry
+R. Winterbottom](mailto:henry.winterbottom@noaa.gov?subject=[ufs_tools])
