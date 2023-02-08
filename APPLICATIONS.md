@@ -9,6 +9,12 @@ the provided applications.
 user@host:$ export PYTHONPATH=/path/to/ufs_pyutils/:/path/to/ufs_tools/ush:$PYTHONPATH
 ~~~
 
+When invoking any of the provided applications within the provided
+Docker container all paths, including those within the respective
+YAML-formatted configurtaion files, must be defined relative to the
+Docker container directory tree. See the examples throughout for
+additional detail.
+
 ## Gridspec
 
 The `gridspec` application provides an interface for generating
