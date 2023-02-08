@@ -18,6 +18,51 @@
 # =========================================================================
 
 """
+Script
+------
+
+    compute_gridspec.py
+
+Description
+-----------
+
+    This script is the driver script for gridspec-formatted grid
+    computations and creations.
+
+Classes
+-------
+
+    GridSpec(options_obj)
+
+        This is the base-class object for all gridspec applications.
+
+Functions
+---------
+
+    main()
+
+        This is the driver-level function to invoke the tasks within
+        this script.
+
+Usage
+-----
+
+    user@host:$ python compute_gridspec.py --yaml_file /path/to/yaml_file
+
+Parameters
+----------
+
+    yaml_file: str
+
+        A Python string specifying the path to the YAML-formatted
+        configuration file for the gridspec application.
+
+        --yaml_file /path/to/yaml/file or -yaml_file /path/to/yaml/file
+
+Requirements
+------------
+
+- ufs_pytils; https://github.com/HenryWinterbottom-NOAA/ufs_pyutils
 
 Author(s)
 ---------
@@ -33,13 +78,11 @@ History
 
 # ----
 
-from dataclasses import dataclass
 import os
 import time
+from dataclasses import dataclass
 
-from exceptions import GridSpecError
 from gridspec.arakawa_c import ArakawaC
-
 from utils.arguments_interface import Arguments
 from utils.logger_interface import Logger
 
@@ -56,31 +99,47 @@ __email__ = "henry.winterbottom@noaa.gov"
 EVAL_SCHEMA = True
 
 # Define the schema attributes.
-CLS_SCHEMA = {
-    "yaml_file": str
-}
+CLS_SCHEMA = {"yaml_file": str}
 
 # ----
 
 
 @dataclass
-class GridSpecDriver:
+class GridSpec:
     """
+    Description
+    -----------
 
+    This is the base-class object for all gridspec applications.
+
+    Parameters
+    ----------
+
+    options_obj: object
+
+        A Python object containing the command line argument
+        attributes.
 
     """
 
     def __init__(self, options_obj: object):
-        """ 
-
-        """
+        """ """
 
         # Define the base-class attributes.
         self.options_obj = options_obj
         self.gridspec = ArakawaC(options_obj=self.options_obj)
 
     def run(self):
-        """ """
+        """
+        Description
+        -----------
+
+        This method performs the following tasks:
+
+        (1) Executes the gridspec application to compute and output
+            the gridspec-formatted file.
+
+        """
         self.gridspec.run()
 
 
@@ -105,7 +164,7 @@ def main():
     options_obj = Arguments().run(eval_schema=EVAL_SCHEMA, cls_schema=CLS_SCHEMA)
 
     # Launch the task.
-    task = GridSpecDriver(options_obj=options_obj)
+    task = GridSpec(options_obj=options_obj)
     task.run()
 
     stop_time = time.time()
