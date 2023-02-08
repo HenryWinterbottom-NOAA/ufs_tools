@@ -34,12 +34,12 @@ Classes
     ESMFRemappingError()
 
         This is the base-class for exceptions encountered within the
-        ush/esmf_remapping module; it is a sub-class of Error. 
+        ush/esmf_remapping module; it is a sub-class of Error.
 
     GridSpecError()
 
         This is the base-class for exceptions encountered within the
-        ush/gridspec module; it is a sub-class of Error.       
+        ush/gridspec module; it is a sub-class of Error.
 
     InnovStatsComputeError()
 
@@ -70,11 +70,7 @@ from utils.error_interface import Error
 # ----
 
 # Define all available attributes.
-__all__ = [
-    "ESMFRemappingError",
-    "GridSpecError",
-    "InnovStatsComputeError"
-]
+__all__ = ["ESMFRemappingError", "GridSpecError", "InnovStatsComputeError"]
 
 # ----
 
@@ -95,6 +91,7 @@ class ESMFRemappingError(Error):
 
     """
 
+
 # ----
 
 
@@ -107,6 +104,7 @@ class GridSpecError(Error):
     ush/gridspec module; it is a sub-class of Error.
 
     """
+
 
 # ----
 
