@@ -34,6 +34,9 @@ obtain the entire system, do as follows.
 user@host:$ git clone https://github.com/HenryWinterbottom-NOAA/ufs_tools
 ~~~
 
+A description of the respective applications may be found
+[here](./APPLICATIONS.md).
+
 # Forking
 
 If a user wishes to contribute modifications done within their
@@ -48,9 +51,4 @@ follow those listed below.
 - `fix/user_branch_name`: Bug-type fixes for the application(s) that do not require immediate attention.
 
 - `hotfix/user_branch_name`: Bug-type fixes which require immediate attention to fix issues that compromise the integrity of the respective application(s). 
-
-# Applications
-
-The following sections describe the supported applications provided
-within this repository.
 
