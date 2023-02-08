@@ -39,6 +39,11 @@ Classes
         Interpolation (GSI) atmosphere innovation statistics
         diagnostics; it is a sub-class of InnovStats.
 
+Requirements
+------------
+
+- ufs_pytils; https://github.com/HenryWinterbottom-NOAA/ufs_pyutils
+
 Author(s)
 ---------
 
