@@ -46,6 +46,11 @@ Classes
         This is the base-class for exceptions encountered within the
         ush/innov_stats/compute module; it is a sub-class of Error.
 
+Requirements
+------------
+
+- ufs_pytils; https://github.com/HenryWinterbottom-NOAA/ufs_pyutils
+
 Author(s)
 ---------
 
