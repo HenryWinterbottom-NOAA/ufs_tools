@@ -49,3 +49,8 @@ follow those listed below.
 
 - `hotfix/user_branch_name`: Bug-type fixes which require immediate attention to fix issues that compromise the integrity of the respective application(s). 
 
+# Applications
+
+The following sections describe the supported applications provided
+within this repository.
+
