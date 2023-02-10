@@ -31,10 +31,10 @@ Description
 Classes
 -------
 
-    ESMFRemappingError()
+    ESMFRemapError()
 
         This is the base-class for exceptions encountered within the
-        ush/esmf_remapping module; it is a sub-class of Error.
+        ush/esmf_remap module; it is a sub-class of Error.
 
     GridSpecError()
 
@@ -70,7 +70,7 @@ from utils.error_interface import Error
 # ----
 
 # Define all available attributes.
-__all__ = ["ESMFRemappingError", "GridSpecError", "InnovStatsComputeError"]
+__all__ = ["ESMFRemapError", "GridSpecError", "InnovStatsComputeError"]
 
 # ----
 
@@ -81,13 +81,13 @@ __email__ = "henry.winterbottom@noaa.gov"
 # ----
 
 
-class ESMFRemappingError(Error):
+class ESMFRemapError(Error):
     """
     Description
     -----------
 
     This is the base-class for exceptions encountered within the
-    ush/esmf_remapping module; it is a sub-class of Error.
+    ush/esmf_remap module; it is a sub-class of Error.
 
     """
 
