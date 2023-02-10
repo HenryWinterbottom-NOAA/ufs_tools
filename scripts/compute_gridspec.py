@@ -32,7 +32,7 @@ Description
 Classes
 -------
 
-    GridSpec(options_obj)
+    ComputeGridSpec(options_obj)
 
         This is the base-class object for all gridspec applications.
 
@@ -146,6 +146,8 @@ class ComputeGridSpec:
             the gridspec-formatted file.
 
         """
+
+        # Compute the and output the gridspec-formatted file.
         self.gridspec.run()
 
 
