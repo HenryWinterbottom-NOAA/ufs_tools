@@ -1,6 +1,6 @@
 # =========================================================================
 
-# Script: scripts/run_gridspec.py
+# Script: scripts/compute_gridspec.py
 
 # Author: Henry R. Winterbottom
 
@@ -105,7 +105,7 @@ CLS_SCHEMA = {"yaml_file": str}
 
 
 @dataclass
-class GridSpec:
+class ComputeGridSpec:
     """
     Description
     -----------
@@ -123,13 +123,19 @@ class GridSpec:
     """
 
     def __init__(self, options_obj: object):
-        """ """
+        """ 
+        Description
+        -----------
+
+        Creates a new ComputeGridSpec object.
+
+        """
 
         # Define the base-class attributes.
         self.options_obj = options_obj
         self.gridspec = ArakawaC(options_obj=self.options_obj)
 
-    def run(self):
+    def run(self) -> None:
         """
         Description
         -----------
@@ -164,7 +170,7 @@ def main():
     options_obj = Arguments().run(eval_schema=EVAL_SCHEMA, cls_schema=CLS_SCHEMA)
 
     # Launch the task.
-    task = GridSpec(options_obj=options_obj)
+    task = ComputeGridSpec(options_obj=options_obj)
     task.run()
 
     stop_time = time.time()
