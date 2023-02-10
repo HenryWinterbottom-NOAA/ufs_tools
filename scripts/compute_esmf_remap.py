@@ -18,15 +18,70 @@
 # =========================================================================
 
 """
+Script
+------
 
+    compute_esmf_remap.py
+
+Description
+-----------
+
+    This script is the driver script for Earth System Modeling
+    Framework (ESMF) remapping attribute computations and definitions.
+
+Classes
+-------
+
+    ComputeESMFRemap(options_obj)
+
+        This is the base-class object for all Earth System Modeling
+        Framework (ESMF) interpolation attributes applications.
+
+Functions
+---------
+
+    main()
+
+        This is the driver-level function to invoke the tasks within
+        this script.
+
+Usage
+-----
+
+    user@host: $ python compute_esmf_remap.py - -yaml_file / path/to/yaml_file
+
+Parameters
+----------
+
+    yaml_file: str
+
+        A Python string specifying the path to the YAML-formatted
+        configuration file for the ESMF remap application.
+
+        --yaml_file / path/to/yaml/file or -yaml_file / path/to/yaml/file
+
+Requirements
+------------
+
+- ufs_pytils; https://github.com/HenryWinterbottom-NOAA/ufs_pyutils
+
+Author(s)
+---------
+
+    Henry R. Winterbottom; 10 February 2023
+
+History
+-------
+
+    2023-02-10: Henry Winterbottom -- Initial implementation.
 
 """
 
 import os
 import time
 from dataclasses import dataclass
-from esmf_remap import ESMFRemap
 
+from esmf_remap import ESMFRemap
 from utils.arguments_interface import Arguments
 from utils.logger_interface import Logger
 
@@ -82,10 +137,20 @@ class ComputeESMFRemap:
 
     def run(self) -> None:
         """
+        Description
+        -----------
+
+        This method performs the following tasks:
+
+        (1) Executes the ESMF remap application to compute and define
+            the ESMF remapping attributes file.
 
         """
 
+        # Compute and define the ESMF remap application remapping
+        # attributes file.
         self.esmf_remap.run()
+
 
 # ----
 
