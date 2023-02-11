@@ -18,6 +18,7 @@ grid_type: C
 # ----
 
 # Define the latitude information attributes.
+```
 latitude:
 
      # Define the path to the netCDF-formatted file containing
@@ -35,6 +36,7 @@ latitude:
      # Define the netCDF-formatted file variable name for the
      # respective geographical coordinate.
      ncvarname: y
+```
 
 # ----
      
