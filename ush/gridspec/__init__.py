@@ -62,6 +62,7 @@ History
 # ----
 
 import os
+from dataclasses import dataclass
 
 import numpy
 from confs.yaml_interface import YAML
@@ -80,6 +81,7 @@ __email__ = "henry.winterbottom@noaa.gov"
 # ----
 
 
+@dataclass
 class GridSpec:
     """
     Description
@@ -131,6 +133,18 @@ class GridSpec:
         (self.grids_obj, self.ncdim_obj, self.ncvar_obj) = [
             parser_interface.object_define() for idx in range(3)
         ]
+
+        # Define the format/orientation of the resulting grid
+        # projection; proceed accordingly.
+        self.is_tripolar = parser_interface.dict_key_value(
+            dict_in=self.yaml_dict, key="is_tripolar", force=True
+        )
+        self.is_tripolar = self.is_tripolar if self.is_tripolar else False
+
+        self.is_wrap_lons = parser_interface.dict_key_value(
+            dict_in=self.yaml_dict, key="is_wrap_lons", force=True
+        )
+        self.is_wrap_lons = self.is_wrap_lons if self.is_wrap_lons else False
 
     def read_ncfile(self) -> None:
         """
@@ -274,6 +288,41 @@ class GridSpec:
             )
 
         return ncvar_obj
+
+    def wrap_lons(self, lons: numpy.array) -> numpy.array:
+        """
+        Description
+        -----------
+
+        This method will order the longitude coordinate array,
+        provided upon entry, within the range [0,
+        numpy.degrees(2*numpy.pi)].
+
+        Parameters
+        ----------
+
+        lons: numpy.array
+
+            A Python numpy.array containing longitude values.
+
+        Returns
+        -------
+
+        lons: numpy.array
+
+            A Python numpy.array containing the ordered longitude
+            values.
+
+        """
+
+        # Define the longitude scaling value.
+        scale = 2.0 * numpy.degrees(numpy.pi)
+
+        # Update the longitude values accordingly.
+        lons = numpy.where((lons > scale), (scale - lons), lons)
+        lons = numpy.where((lons < 0.0), (lons + scale), lons)
+
+        return lons
 
     def write_ncfile(self) -> None:
         """
