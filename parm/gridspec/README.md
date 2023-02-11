@@ -12,15 +12,15 @@ is_wrap_lons: True
 latitude:
 
      ncfile: /run/mom6_cice_grids/0p25/ocean_hgrid.nc
+     ncvarname: y
      ncxdim: nx
      ncydim: ny
-     ncvarname: y
 
 longitude:
      ncfile: /run/mom6_cice_grids/0p25/ocean_hgrid.nc
+     ncvarname: x
      ncxdim: nx
      ncydim: ny
-     ncvarname: x
 
 output_netcdf: /run/gridspec.tripolar.0p25.nc
 
@@ -51,5 +51,8 @@ YAML-keys within the YAML bloeks.
 | Variable | Description |
 | :-------------: | :-----------: |
 | `ncfile` | <div align="left">The path to the [netCDF](https://www.unidata.ucar.edu/software/netcdf/)-formatted filepath containing the respective geographical coordinate variable values; note that if this application is run within the provided Docker (or Singularity) container, the directory-tree component of the path must be a path bound to the container when it is launched.</div> |
+| `ncvarname` | <div align="left">The netCDF variable name corresponding to the respective geographical coordinate variable within the netCDF-formatted filepath. </div> |
+| `nx` | <div align="left">The netCDF zonal-coordinate dimension variable name within the netCDF-formatted filepath. </div> |
+| `ny` | <div align="left">The netCDF meridional-coordinate dimension variable name within the netCDF-formatted filepath. </div> |
 
 </div>
