@@ -60,6 +60,14 @@ YAML-keys within the YAML bloeks.
 
 </div>
 
+### Example Configurations
+
+<div align="center">
+
+| Nominal Resolution | Projection | Configuration File |
+| :-------------: | :-----------: | :-----------: |
+| `$0.25\degree` | Tripolar | [`gridspec.tripolar.0p25.yaml`](./gridspec.tripolar.0p25.yaml) | 
+
 #
 
 Please direct questions to [Henry
