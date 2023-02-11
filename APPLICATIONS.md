@@ -46,7 +46,8 @@ user@host:$ python compute_gridspec.py --yaml_file=/path/to/gridspec/yaml
 ~~~
 
 Note that the `yaml_file` attribute path is relative to the Docker
-container directory tree.
+container directory tree. Descriptions of the YAML-formatted file
+attributes can be found [here](parm/gridspec/README.md).
 
 #
 
