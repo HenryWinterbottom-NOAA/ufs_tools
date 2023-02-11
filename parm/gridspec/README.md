@@ -67,6 +67,9 @@ YAML-keys within the YAML bloeks.
 | Nominal Resolution | Projection | Configuration File |
 | :-------------: | :-----------: | :-----------: |
 | $0.25\degree \times 0.25\degree$ | Tripolar | [`gridspec.tripolar.0p25.yaml`](./gridspec.tripolar.0p25.yaml) | 
+| $0.5\degree \times 0.5\degree$ | Tripolar | [`gridspec.tripolar.0p5.yaml`](./gridspec.tripolar.0p5.yaml) | 
+| $1.0\degree \times 1.0\degree$ | Tripolar | [`gridspec.tripolar.1p0.yaml`](./gridspec.tripolar.1p0.yaml) | 
+| $5.0\degree \times 5.0\degree$ | Tripolar | [`gridspec.tripolar.5p0.yaml`](./gridspec.tripolar.5p0.yaml) | 
 
 #
 
