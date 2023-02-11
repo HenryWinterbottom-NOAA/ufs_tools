@@ -71,6 +71,8 @@ YAML-keys within the YAML bloeks.
 | $1.0\degree \times 1.0\degree$ | Tripolar | [`gridspec.tripolar.1p0.yaml`](./gridspec.tripolar.1p0.yaml) | 
 | $5.0\degree \times 5.0\degree$ | Tripolar | [`gridspec.tripolar.5p0.yaml`](./gridspec.tripolar.5p0.yaml) | 
 
+</div>
+
 #
 
 Please direct questions to [Henry
