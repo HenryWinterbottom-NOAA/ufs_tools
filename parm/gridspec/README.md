@@ -2,9 +2,9 @@
 
 This document describes the configuration options for the `gridspec`
 application. The following is a snippet of a YAML-formatted `gridspec`
-application configuration file computing/defining a gridspec-formatted
-file from a MOM6/CICE 0.25-degree [supergrid
-projection](https://mom6.readthedocs.io/en/main/api/generated/pages/Discrete_Grids.html#horizontal-grids). Currently
+application configuration file for computing/defining a
+gridspec-formatted file from a MOM6/CICE 0.25-degree [supergrid
+projection](https://mom6.readthedocs.io/en/main/api/generated/pages/Discrete_Grids.html#horizontal-grids)[^1]. [^1]:Currently
 only supergrid to gridspec-format are supported.
 
 ~~~
