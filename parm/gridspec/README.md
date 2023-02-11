@@ -1,8 +1,11 @@
 # Configuring the Gridspec Application
 
 This document describes the configuration options for the `gridspec`
-application. The following is a snippet of a YAML-formatted
-configuration file for the `gridspec` application.
+application. The following is a snippet of a YAML-formatted `gridspec`
+application configuration file computing/defining a gridspec-formatted
+file from a MOM6/CICE 0.25-degree [supergrid
+projection](https://mom6.readthedocs.io/en/main/api/generated/pages/Discrete_Grids.html#horizontal-grids). Currently
+only supergrid to gridspec-format are supported.
 
 ~~~
 grid_type: C
@@ -10,7 +13,6 @@ is_tripolar: True
 is_wrap_lons: True
 
 latitude:
-
      ncfile: /run/mom6_cice_grids/0p25/ocean_hgrid.nc
      ncvarname: y
      ncxdim: nx
