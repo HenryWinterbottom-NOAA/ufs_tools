@@ -50,6 +50,6 @@ YAML-keys within the YAML bloeks.
 
 | Variable | Description |
 | :-------------: | :-----------: |
-| `ncfile` | The path to the [netCDF](https://www.unidata.ucar.edu/software/netcdf/)-formatted filepath containing the respective geographical coordinate variable values; note that if this application is run within the provided Docker (or Singularity) container, the directory-tree component of the path must be a path bound to the container when it is launched.</div> |
+| `ncfile` | <div align="left">The path to the [netCDF](https://www.unidata.ucar.edu/software/netcdf/)-formatted filepath containing the respective geographical coordinate variable values; note that if this application is run within the provided Docker (or Singularity) container, the directory-tree component of the path must be a path bound to the container when it is launched.</div> |
 
 </div>
