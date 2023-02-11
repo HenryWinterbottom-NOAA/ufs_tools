@@ -60,8 +60,6 @@ YAML-keys within the YAML bloeks.
 
 </div>
 
-# 
-
 # Example Configurations
 
 <div align="center">
