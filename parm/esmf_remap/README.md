@@ -50,10 +50,10 @@ file (see `output_netCDF`).
 | `gribfile` | <div align="left">The path to the WMO-GRIB formatted file containing the respective grid's projection.</div> | 
 | `is_netcdf` | <div align="left">A boolean valued variable defining whether the respective grid's projection is defined (and to be collected from) a [netCDF](https://www.unidata.ucar.edu/software/netcdf/)-formatted file.</div> |
 | `ncfile` | <div align="left">The path to the netCDF-formatted file containing the respective grid's projection.</div> | 
-| `ncxdim_name` | <div align="left">The x-dimension for the respective geographical location variable arrays (see `nclat` and `nclon`).</div> |
-| `ncydim_name` | <div align="left">The y-dimension for the respective geographical location variable arrays (see `nclat` and `nclon`).</div> |
 | `nclat` | <div align="left">The netCDF-formatted file variable name for the latitude geographical location variable array.</div> | 
 | `nclon` | <div align="left">The netCDF-formatted file variable name for the longitude geographical location variable array.</div> | 
+| `ncxdim_name` | <div align="left">The x-dimension for the respective geographical location variable arrays (see `nclat` and `nclon`).</div> |
+| `ncydim_name` | <div align="left">The y-dimension for the respective geographical location variable arrays (see `nclat` and `nclon`).</div> |
 
 </div>
 
@@ -91,8 +91,8 @@ tripolar.0p25_5p0.bilinear.t2t_remap:
           ncxdim_name: nx
           ncydim_name: ny
 
-     output_netCDF: /run/tripolar.0p25_5p0.bilinear.t2t_remap.nc
      interp_type: bilinear
+     output_netCDF: /run/tripolar.0p25_5p0.bilinear.t2t_remap.nc
           
 tripolar.0p25_5p0.nearest_s2d.t2t_remap:
 
@@ -118,8 +118,8 @@ tripolar.0p25_5p0.nearest_s2d.t2t_remap:
           ncxdim_name: nx
           ncydim_name: ny
 
-     output_netCDF: /run/tripolar.0p25_5p0.nearest_s2d.t2t_remap.nc
      interp_type: nearest_s2d
+     output_netCDF: /run/tripolar.0p25_5p0.nearest_s2d.t2t_remap.nc
 ~~~
 
 In the above example, YAML keys define a unique name for the remapping
