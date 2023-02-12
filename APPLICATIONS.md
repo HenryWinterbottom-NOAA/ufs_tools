@@ -15,6 +15,16 @@ YAML-formatted configurtaion files, must be defined relative to the
 Docker container directory tree. See the examples throughout for
 additional detail.
 
+## ESMF Remapping
+
+The `esmf-remap` application provides an interface to generate Earth
+System Modeling Framework ([ESMF](https://earthsystemmodeling.org/))
+remapping coefficient files. Both a stand-alone as well as a wrapper
+script to generate the ESMF remapping coefficients are provided within
+this repository. It is strongly urged that the input grids/files used
+to generate the ESMF remapping coefficient files are generated using
+the [gridspec](#markd-wn-hearder-gridspec) application.
+
 ## GridSpec
 
 The `gridspec` application provides an interface for generating
