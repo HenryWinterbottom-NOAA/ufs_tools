@@ -54,7 +54,24 @@ Note that the `yaml_file` attribute path is relative to the Docker
 container directory tree. Descriptions of the YAML-formatted file
 attributes can be found [here](parm/esmf_remap/README.md).
 
-In addition to the stand-alone 
+In addition to the stand-alone application defined above, a wrapper
+application is also provided. If choosing to launch the wrapper
+application within the user shell, do as follows.
+
+~~~
+user@host:$ cd wrappers/
+user@host:$ python wrapper_esmf_remap.py --yaml_file /path/to/wrapper_esmf_remap/yaml --yaml_template /path/to/wrapper_esmf/wrapper_yaml --script_path /path/to/scripts/compute_esmf_remap.py
+~~~
+
+If choosing to launch the application within the available Docker
+container, do as follows.
+
+~~~
+user@host:$ docker container run -v /path/to/ufs_tools:/ufs_tools -v /path/to/run:/run run -it ubuntu20.04-miniconda_ufs_pyutils.ufs_tools:latest
+user@host:$ export PYTHONPATH=/ufs_tools/ush:$PYTHONPATH
+user@host:$ cd /ufs_tools/wrappers
+user@host:$ python wrapper_esmf_remap.py --yaml_file /path/to/wrapper_esmf_remap/yaml --yaml_template /path/to/wrapper_esmf/wrapper_yaml --script_path /path/to/scripts/compute_esmf_remap.py
+~~~
 
 ## GridSpec
 
