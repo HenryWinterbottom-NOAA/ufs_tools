@@ -124,7 +124,10 @@ tripolar.0p25_5p0.nearest_s2d.t2t_remap:
 
 In the above example, YAML keys define a unique name for the remapping
 instance. The remainder of the variables within the respective block
-are the same as in the table above.
+are the same as in the table above. Finally, a `yaml_template`
+attribute example is provided in `esmf_remap_tmpl.yaml`. Note that
+this is a file identical to that used for the `compute_esmf_remap.py`
+application described above. It should not be modified by the user.
 
 #
 
