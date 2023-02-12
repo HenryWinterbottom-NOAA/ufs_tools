@@ -12,21 +12,21 @@ grids:
           is_grib: False
           gribfile: Null
           is_netcdf: True
-          ncfile: /run/gridspec.tripolar.0p25.nc
-          ncxdim_name: nx
-          ncydim_name: ny          
+          ncfile: /run/gridspec.tripolar.0p25.nc        
           nclat: tlat
           nclon: tlon
+          ncxdim_name: nx
+          ncydim_name: ny
 
      source:
           is_grib: False
           gribfile: Null
           is_netcdf: True
-          ncfile: /run/gridspec.tripolar.5p0.nc
-          ncxdim_name: nx
-          ncydim_name: ny          
+          ncfile: /run/gridspec.tripolar.5p0.nc      
           nclat: tlat
           nclon: tlon
+          ncxdim_name: nx
+          ncydim_name: ny    
 
 interp_type: bilinear
 output_netCDF: /run/tripolar.0p25_5p0.bilinear.t2t_remap.nc
@@ -62,80 +62,69 @@ remapping (i.e., how the ESMF coeffients are defined/computed). The
 currently supported options are `bilinear`, `nearest_d2s`, and
 `nearest_s2d`.
 
-# Configuring the Gridspec Application
-
-This document describes the configuration options for the `gridspec`
-application. The following is a snippet of a YAML-formatted `gridspec`
-application configuration file for computing/defining a
-gridspec-formatted file from a MOM6/CICE 0.25-degree [supergrid
-projection](https://mom6.readthedocs.io/en/main/api/generated/pages/Discrete_Grids.html#horizontal-grids)[^1].
-
-[^1]: Currently only supergrid to gridspec-format are supported.
+The above-mentioned wrapper application,
+`wrappers/wrapper_esmf_remap.py` allows the user to execute several
+sequential instances of the ESMF remapping application. The following
+code snippet describes the required YAML-formatted configuration file.
 
 ~~~
-grid_type: C
-is_tripolar: True
-is_wrap_lons: True
+tripolar.0p25_5p0.bilinear.t2t_remap:
 
-latitude:
-     ncfile: /run/mom6_cice_grids/0p25/ocean_hgrid.nc
-     ncvarname: y
-     ncxdim: nx
-     ncydim: ny
+     destination:
+          is_grib: False
+          gribfile: Null
+          is_netcdf: True
+          ncfile: /run/gridspec.tripolar.5p0.nc
+          nclat: tlat
+          nclon: tlon
+          ncxdim_name: nx
+          ncydim_name: ny     
+     
+     source:
 
-longitude:
-     ncfile: /run/mom6_cice_grids/0p25/ocean_hgrid.nc
-     ncvarname: x
-     ncxdim: nx
-     ncydim: ny
+          is_grib: False
+          gribfile: Null
+          is_netcdf: True
+          ncfile: /run/gridspec.tripolar.0p25.nc
+          nclat: tlat
+          nclon: tlon
+          ncxdim_name: nx
+          ncydim_name: ny
 
-output_netcdf: /run/gridspec.tripolar.0p25.nc
+     output_netCDF: /run/tripolar.0p25_5p0.bilinear.t2t_remap.nc
+     interp_type: bilinear
+          
+tripolar.0p25_5p0.nearest_s2d.t2t_remap:
 
+     destination:
+
+          is_grib: False
+          gribfile: Null
+          is_netcdf: True
+          ncfile: /run/gridspec.tripolar.5p0.nc
+          nclat: tlat
+          nclon: tlon
+          ncxdim_name: nx
+          ncydim_name: ny     
+
+     source:
+
+          is_grib: False
+          gribfile: Null
+          is_netcdf: True
+          ncfile: /run/gridspec.tripolar.0p25.nc
+          nclat: tlat
+          nclon: tlon
+          ncxdim_name: nx
+          ncydim_name: ny
+
+     output_netCDF: /run/tripolar.0p25_5p0.nearest_s2d.t2t_remap.nc
+     interp_type: nearest_s2d
 ~~~
 
-The following table describes each of the respective variables above.
-
-<div align="center">
-
-| Variable | Description |
-| :-------------: | :-----------: |
-| `grid_type` | <div align="left">This variable value specifies the type of Arakawa-type grids to define/compute; a comprehensive list of Arakawa-type grids can be found [here](https://en.wikipedia.org/wiki/Arakawa_grids); currently only Arakawa-C type grids are supported.</div> |
-| `is_tripolar` | <div align="left">This variable value specifies whether the output gridspec-formatted file is a tri-polar grid projection, a discussion of which can be found [here](https://github.com/dtcenter/MET/issues/1231); for Arakawa-C type tripolar grid projections the dimensions of the zonal- and meridional-velocity grid geographical locations must be the same as the mass grids geographical location array dimensions; this requires that the arrays are define accordingly.</div> |
-| `is_wrap_lons` | <div align="left">If `True`, the longitude coordinate values will be reset within the range $[0, 2\pi)$.</div>|
-| `output_netcdf` | <div align="left">The path to the netCDF-formatted gridspec-formatted output file; note that if this application is run within the provided Docker (or Singularity) container, the directory-tree component of the path must be a path bound to the container when it is launched.</div> | 
-
-</div>
-
-The `latitude` and `longitude` YAML keys within the example
-configuration define the attributes for the respective geographical
-coordinates. Seperate YAML blocks are implemented to support instances
-when the respective geographical coordinate values are collected from
-different file path sources. The following section describes the
-YAML-keys within the YAML bloeks.
-
-<div align="center">
-
-| Variable | Description |
-| :-------------: | :-----------: |
-| `ncfile` | <div align="left">The path to the [netCDF](https://www.unidata.ucar.edu/software/netcdf/)-formatted filepath containing the respective geographical coordinate variable values; note that if this application is run within the provided Docker (or Singularity) container, the directory-tree component of the path must be a path bound to the container when it is launched.</div> |
-| `ncvarname` | <div align="left">The netCDF variable name corresponding to the respective geographical coordinate variable within the netCDF-formatted filepath. </div> |
-| `nx` | <div align="left">The netCDF zonal-coordinate dimension variable name within the netCDF-formatted filepath. </div> |
-| `ny` | <div align="left">The netCDF meridional-coordinate dimension variable name within the netCDF-formatted filepath. </div> |
-
-</div>
-
-# Example Configurations
-
-<div align="center">
-
-| Nominal Resolution | Projection | Configuration File |
-| :-------------: | :-----------: | :-----------: |
-| $0.25\degree \times 0.25\degree$ | Tripolar | [`gridspec.tripolar.0p25.yaml`](./gridspec.tripolar.0p25.yaml) | 
-| $0.5\degree \times 0.5\degree$ | Tripolar | [`gridspec.tripolar.0p5.yaml`](./gridspec.tripolar.0p5.yaml) | 
-| $1.0\degree \times 1.0\degree$ | Tripolar | [`gridspec.tripolar.1p0.yaml`](./gridspec.tripolar.1p0.yaml) | 
-| $5.0\degree \times 5.0\degree$ | Tripolar | [`gridspec.tripolar.5p0.yaml`](./gridspec.tripolar.5p0.yaml) | 
-
-</div>
+In the above example, YAML keys define a unique name for the remapping
+instance. The remainder of the variables within the respective block
+are the same as in the table above.
 
 #
 
