@@ -1,0 +1,78 @@
+# Define the output netCDF file to contain the ESMF remapping
+# attributes.
+output_netCDF: /run/tripolar.0p25_5p0.bilinear.t2t_remap.nc
+
+# Define the interpolation type for the ESMF remapping attributes;
+# allowable values are bilinear, nearest_s2d, and nearest_d2s.
+interp_type: bilinear
+
+# ----
+
+# Configuration options for all input and output grids.
+grids:
+
+     # Define the source grid attributes.
+     destination:
+
+          # Specify whether the source grid is collected from a WMO
+          # GRIB formatted file.
+          is_grib: False
+
+          # Define the source grid WMO GRIB formatted file name.
+          gribfile: Null
+
+          # Specify whether the source grid is collected from a netCDF
+          # formatted file.
+          is_netcdf: True
+     
+          # Define the source grid netCDF formatted file name.
+          ncfile: /run/gridspec.tripolar.0p25.nc
+
+          # Define the x-dimension coordinate name corresponding to
+          # the respective Arakawa grid staggering.
+          ncxdim_name: nx
+
+          # Define the x-dimension coordinate name corresponding to
+          # the respective Arakawa grid staggering.
+          ncydim_name: ny          
+
+          # Define the netCDF variable name for the latitude
+          # coordinate variable.
+          nclat: tlat
+
+          # Define the netCDF variable name for the longitude
+          # coordinate variable.
+          nclon: tlon
+
+     # Define the destination grid attributes.
+     source:
+
+          # Specify whether the destination grid is collected from a
+          # WMO GRIB formatted file.
+          is_grib: False
+
+          # Define the destination grid WMO GRIB formatted file name.
+          gribfile: Null
+
+          # Specify whether the destination grid is collected from a
+          # netCDF formatted file.
+          is_netcdf: True
+
+          # Define the destination grid netCDF formatted file name.
+          ncfile: /run/gridspec.tripolar.5p0.nc
+
+          # Define the x-dimension coordinate name corresponding to
+          # the respective Arakawa grid staggering.
+          ncxdim_name: nx
+
+          # Define the x-dimension coordinate name corresponding to
+          # the respective Arakawa grid staggering.
+          ncydim_name: ny
+
+          # Define the netCDF variable name for the latitude
+          # coordinate variable.
+          nclat: tlat
+
+          # Define the netCDF variable name for the longitude
+          # coordinate variable.
+          nclon: tlon       
