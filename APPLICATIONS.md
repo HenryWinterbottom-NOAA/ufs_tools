@@ -21,9 +21,11 @@ The `esmf-remap` application provides an interface to generate Earth
 System Modeling Framework ([ESMF](https://earthsystemmodeling.org/))
 remapping coefficient files. Both a stand-alone as well as a wrapper
 script to generate the ESMF remapping coefficients are provided within
-this repository. <i><b>It is strongly urged that the input grids/files used
-to generate the ESMF remapping coefficient files are generated using
-the [gridspec](#gridspec) application.</b></i>
+this repository[^1].
+
+[^1]: It is strongly urged that the input grids/files used to generate
+the ESMF remapping coefficient files are generated using the
+[gridspec](#gridspec) application.
 
 To launch the application within the user shell, do as follows.
 
