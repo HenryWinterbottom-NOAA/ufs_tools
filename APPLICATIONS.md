@@ -23,7 +23,7 @@ remapping coefficient files. Both a stand-alone as well as a wrapper
 script to generate the ESMF remapping coefficients are provided within
 this repository. It is strongly urged that the input grids/files used
 to generate the ESMF remapping coefficient files are generated using
-the [gridspec](#markd-wn-hearder-gridspec) application.
+the [gridspec](#markdown-hearder-gridspec) application.
 
 ## GridSpec
 
