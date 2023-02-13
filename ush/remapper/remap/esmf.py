@@ -38,6 +38,13 @@ Classes
         This is the base-class object for all ESMF remapping
         applications via xesmf; it is a sub-class of Remap.
 
+Requirements
+------------
+
+- ufs_pytils; https://github.com/HenryWinterbottom-NOAA/ufs_pyutils
+
+- xesmf; https://github.com/pangeo-data/xESMF
+
 Author(s)
 ---------
 
@@ -497,8 +504,10 @@ class ESMF(Remap):
         """
 
         # Define the respective grid-type attributes.
-        dstgrid = self.get_grid(grid_obj=self.dstgrid_obj, grid_stagger=dstgrid_stagger)
-        srcgrid = self.get_grid(grid_obj=self.srcgrid_obj, grid_stagger=srcgrid_stagger)
+        dstgrid = self.get_grid(grid_obj=self.dstgrid_obj,
+                                grid_stagger=dstgrid_stagger)
+        srcgrid = self.get_grid(grid_obj=self.srcgrid_obj,
+                                grid_stagger=srcgrid_stagger)
 
         # Define the file path to contain (or containing) the
         # remapping attributes.
