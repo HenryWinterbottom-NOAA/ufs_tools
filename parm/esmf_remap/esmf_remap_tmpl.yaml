@@ -1,0 +1,78 @@
+# Define the output netCDF file to contain the ESMF remapping
+# attributes.
+output_netCDF: !ENV ${OUTPUT_NETCDF}
+
+# Define the interpolation type for the ESMF remapping attributes;
+# allowable values are bilinear, nearest_s2d, and nearest_d2s.
+interp_type: !ENV ${INTERP_TYPE}
+
+# ----
+
+# Configuration options for all input and output grids.
+grids:
+
+     # Define the destination grid attributes.
+     destination:
+
+          # Specify whether the destination grid is collected from a
+          # WMO GRIB formatted file.
+          is_grib: !ENV ${DST_IS_GRIB}
+
+          # Define the destination grid WMO GRIB formatted file name.
+          gribfile: !ENV ${DST_GRIBFILE}
+
+          # Specify whether the destination grid is collected from a
+          # netCDF formatted file.
+          is_netcdf: !ENV ${DST_IS_NETCDF}
+     
+          # Define the destination grid netCDF formatted file name.
+          ncfile: !ENV ${DST_NCFILE}
+
+          # Define the x-dimension coordinate name corresponding to
+          # the respective Arakawa grid staggering.
+          ncxdim_name: !ENV ${DST_NCXDIM_NAME}
+
+          # Define the x-dimension coordinate name corresponding to
+          # the respective Arakawa grid staggering.
+          ncydim_name: !ENV ${DST_NCYDIM_NAME}          
+
+          # Define the netCDF variable name for the latitude
+          # coordinate variable.
+          nclat: !ENV ${DST_NCLAT}
+
+          # Define the netCDF variable name for the longitude
+          # coordinate variable.
+          nclon: !ENV ${DST_NCLON}
+
+     # Define the source grid attributes.
+     source:
+
+          # Specify whether the source grid is collected from a WMO
+          # GRIB formatted file.
+          is_grib: !ENV ${SRC_IS_GRIB}
+
+          # Define the source grid WMO GRIB formatted file name.
+          gribfile: !ENV ${SRC_GRIBFILE}
+
+          # Specify whether the source grid is collected from a netCDF
+          # formatted file.
+          is_netcdf: !ENV ${SRC_IS_NETCDF}
+     
+          # Define the source grid netCDF formatted file name.
+          ncfile: !ENV ${SRC_NCFILE}
+
+          # Define the x-dimension coordinate name corresponding to
+          # the respective Arakawa grid staggering.
+          ncxdim_name: !ENV ${SRC_NCXDIM_NAME}
+
+          # Define the x-dimension coordinate name corresponding to
+          # the respective Arakawa grid staggering.
+          ncydim_name: !ENV ${SRC_NCYDIM_NAME}          
+
+          # Define the netCDF variable name for the latitude
+          # coordinate variable.
+          nclat: !ENV ${SRC_NCLAT}
+
+          # Define the netCDF variable name for the longitude
+          # coordinate variable.
+          nclon: !ENV ${SRC_NCLON}     

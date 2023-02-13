@@ -1,6 +1,6 @@
 # =========================================================================
 
-# Script: scripts/compute_gridspec.py
+# Script: scripts/compute_esmf_remap.py
 
 # Author: Henry R. Winterbottom
 
@@ -21,20 +21,21 @@
 Script
 ------
 
-    compute_gridspec.py
+    compute_esmf_remap.py
 
 Description
 -----------
 
-    This script is the driver script for gridspec-formatted grid
-    computations and creations.
+    This script is the driver script for Earth System Modeling
+    Framework (ESMF) remapping attribute computations and definitions.
 
 Classes
 -------
 
-    ComputeGridSpec(options_obj)
+    ComputeESMFRemap(options_obj)
 
-        This is the base-class object for all gridspec applications.
+        This is the base-class object for all Earth System Modeling
+        Framework (ESMF) interpolation attributes applications.
 
 Functions
 ---------
@@ -47,7 +48,7 @@ Functions
 Usage
 -----
 
-    user@host:$ python compute_gridspec.py --yaml_file /path/to/yaml_file
+    user@host: $ python compute_esmf_remap.py - -yaml_file / path/to/yaml_file
 
 Parameters
 ----------
@@ -55,9 +56,9 @@ Parameters
     yaml_file: str
 
         A Python string specifying the path to the YAML-formatted
-        configuration file for the gridspec application.
+        configuration file for the ESMF remap application.
 
-        --yaml_file /path/to/yaml/file or -yaml_file /path/to/yaml/file
+        --yaml_file / path/to/yaml/file or -yaml_file / path/to/yaml/file
 
 Requirements
 ------------
@@ -67,12 +68,12 @@ Requirements
 Author(s)
 ---------
 
-    Henry R. Winterbottom; 07 February 2023
+    Henry R. Winterbottom; 10 February 2023
 
 History
 -------
 
-    2023-02-07: Henry Winterbottom -- Initial implementation.
+    2023-02-10: Henry Winterbottom -- Initial implementation.
 
 """
 
@@ -82,7 +83,7 @@ import os
 import time
 from dataclasses import dataclass
 
-from gridspec.arakawa_c import ArakawaC
+from esmf_remap import ESMFRemap
 from utils.arguments_interface import Arguments
 from utils.logger_interface import Logger
 
@@ -105,12 +106,13 @@ CLS_SCHEMA = {"yaml_file": str}
 
 
 @dataclass
-class ComputeGridSpec:
+class ComputeESMFRemap:
     """
     Description
     -----------
 
-    This is the base-class object for all gridspec applications.
+    This is the base-class object for all Earth System Modeling
+    Framework (ESMF) interpolation attributes applications.
 
     Parameters
     ----------
@@ -123,17 +125,17 @@ class ComputeGridSpec:
     """
 
     def __init__(self, options_obj: object):
-        """ 
+        """
         Description
         -----------
 
-        Creates a new ComputeGridSpec object.
+        Creates a new ComputeESMFRemap object.
 
         """
 
         # Define the base-class attributes.
         self.options_obj = options_obj
-        self.gridspec = ArakawaC(options_obj=self.options_obj)
+        self.esmf_remap = ESMFRemap(options_obj=self.options_obj)
 
     def run(self) -> None:
         """
@@ -142,13 +144,14 @@ class ComputeGridSpec:
 
         This method performs the following tasks:
 
-        (1) Executes the gridspec application to compute and output
-            the gridspec-formatted file.
+        (1) Executes the ESMF remap application to compute and define
+            the ESMF remapping attributes file.
 
         """
 
-        # Compute the and output the gridspec-formatted file.
-        self.gridspec.run()
+        # Compute and define the ESMF remap application remapping
+        # attributes file.
+        self.esmf_remap.run()
 
 
 # ----
@@ -172,7 +175,7 @@ def main():
     options_obj = Arguments().run(eval_schema=EVAL_SCHEMA, cls_schema=CLS_SCHEMA)
 
     # Launch the task.
-    task = ComputeGridSpec(options_obj=options_obj)
+    task = ComputeESMFRemap(options_obj=options_obj)
     task.run()
 
     stop_time = time.time()

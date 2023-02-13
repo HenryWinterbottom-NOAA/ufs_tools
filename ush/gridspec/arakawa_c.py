@@ -59,6 +59,7 @@ History
 
 # pylint: disable=eval-used
 # pylint: disable=invalid-name
+# pylint: disable=too-many-branches
 # pylint: disable=unused-variable
 
 # ----
@@ -108,45 +109,55 @@ class ArakawaC(GridSpec):
         # Define the base-class attributes.
         super().__init__(options_obj=options_obj)
 
+        # Define the reduced grid dimension attributes accordingly.
+        if self.is_tripolar:
+            (qdims, tdims, udims, vdims) = [["ny", "nx"] for i in range(4)]
+
+        if not self.is_tripolar:
+            qdims = ["nyp", "nxp"]
+            tdims = ["ny", "nx"]
+            udims = ["ny", "nxp"]
+            vdims = ["nyp", "nx"]
+
         # Define the reduced grid variable attributes.
         self.reduce_grid_dict = {
             "qlat": {
-                "dims": ["nyp", "nxp"],
+                "dims": qdims,
                 "desc": "Array of q-grid latitudes; degrees north.",
                 "type": "float64",
             },
             "qlon": {
-                "dims": ["nyp", "nxp"],
+                "dims": qdims,
                 "desc": "Array of q-grid longitudes; degrees east.",
                 "type": "float64",
             },
             "tlat": {
-                "dims": ["ny", "nx"],
+                "dims": tdims,
                 "desc": "Array of t-grid latitudes; degrees north.",
                 "type": "float64",
             },
             "tlon": {
-                "dims": ["ny", "nx"],
+                "dims": tdims,
                 "desc": "Array of t-grid longtudes; degrees east.",
                 "type": "float64",
             },
             "ulat": {
-                "dims": ["ny", "nxp"],
+                "dims": udims,
                 "desc": "Array of u-grid latitudes; degrees north.",
                 "type": "float64",
             },
             "ulon": {
-                "dims": ["ny", "nxp"],
+                "dims": udims,
                 "desc": "Array of u-grid longitudes; degrees east.",
                 "type": "float64",
             },
             "vlat": {
-                "dims": ["nyp", "nx"],
+                "dims": vdims,
                 "desc": "Array of v-grid latitudes; degrees north.",
                 "type": "float64",
             },
             "vlon": {
-                "dims": ["nyp", "nx"],
+                "dims": vdims,
                 "desc": "Array of v-grid longitudes; degrees east.",
                 "type": "float64",
             },
@@ -168,24 +179,51 @@ class ArakawaC(GridSpec):
         """
 
         # Define the grid-cell corner point geographical coordinate
-        # values using the supergrid.
-        qlat = self.grids_obj.latitude.ncvalues[::2, ::2]
-        qlon = self.grids_obj.longitude.ncvalues[::2, ::2]
+        # values using the supergrid; proceed accordingly.
+        if self.is_tripolar:
+            qlat = self.grids_obj.latitude.ncvalues[2::2, 2::2]
+            qlon = self.grids_obj.longitude.ncvalues[2::2, 2::2]
+
+        if not self.is_tripolar:
+            qlat = self.grids_obj.latitude.ncvalues[::2, ::2]
+            qlon = self.grids_obj.longitude.ncvalues[::2, ::2]
+
+        if self.is_wrap_lons:
+            qlon = self.wrap_lons(lons=qlon)
 
         # Define the mass variable geographical grid coordinate
-        # values using the supergrid.
+        # values using the supergrid; proceed accordingly.
         tlat = self.grids_obj.latitude.ncvalues[1::2, 1::2]
         tlon = self.grids_obj.longitude.ncvalues[1::2, 1::2]
 
+        if self.is_wrap_lons:
+            tlon = self.wrap_lons(lons=tlon)
+
         # Define the zonal-velocity variable geographical coordinate
-        # values using the supergrid.
-        ulat = self.grids_obj.latitude.ncvalues[1::2, ::2]
-        ulon = self.grids_obj.longitude.ncvalues[1::2, ::2]
+        # values using the supergrid; proceed accordingly.
+        if self.is_tripolar:
+            ulat = self.grids_obj.latitude.ncvalues[1::2, 2::2]
+            ulon = self.grids_obj.longitude.ncvalues[1::2, 2::2]
+
+        if not self.is_tripolar:
+            ulat = self.grids_obj.latitude.ncvalues[1::2, ::2]
+            ulon = self.grids_obj.longitude.ncvalues[1::2, ::2]
+
+        if self.is_wrap_lons:
+            ulon = self.wrap_lons(lons=ulon)
 
         # Define the meridional-velocity variable geographical
-        # coordinate values using the supergrid.
-        vlat = self.grids_obj.latitude.ncvalues[::2, 1::2]
-        vlon = self.grids_obj.longitude.ncvalues[::2, 1::2]
+        # coordinate values using the supergrid; proceed accordingly.
+        if self.is_tripolar:
+            vlat = self.grids_obj.latitude.ncvalues[2::2, 1::2]
+            vlon = self.grids_obj.longitude.ncvalues[2::2, 1::2]
+
+        if not self.is_tripolar:
+            vlat = self.grids_obj.latitude.ncvalues[::2, 1::2]
+            vlon = self.grids_obj.longitude.ncvalues[::2, 1::2]
+
+        if self.is_wrap_lons:
+            vlon = self.wrap_lons(lons=vlon)
 
         # Update the base-class attribute containing the reduced grid
         # attributes.
@@ -195,22 +233,27 @@ class ArakawaC(GridSpec):
                 object_in=self.reduce_grid_obj, key=reduce_grid, value=eval(reduce_grid)
             )
 
-        # Define the netCDF grid-coordinate dimensions.
+        # Define the netCDF grid-coordinate dimensions; proceed
+        # accordingly.
         nx = tlon.shape[1]
         self.ncdim_obj = parser_interface.object_setattr(
             object_in=self.ncdim_obj, key="nx", value=nx
         )
-        self.ncdim_obj = parser_interface.object_setattr(
-            object_in=self.ncdim_obj, key="nxp", value=(nx + 1)
-        )
+
+        if not self.is_tripolar:
+            self.ncdim_obj = parser_interface.object_setattr(
+                object_in=self.ncdim_obj, key="nxp", value=(nx + 1)
+            )
 
         ny = tlat.shape[0]
         self.ncdim_obj = parser_interface.object_setattr(
             object_in=self.ncdim_obj, key="ny", value=ny
         )
-        self.ncdim_obj = parser_interface.object_setattr(
-            object_in=self.ncdim_obj, key="nyp", value=(ny + 1)
-        )
+
+        if not self.is_tripolar:
+            self.ncdim_obj = parser_interface.object_setattr(
+                object_in=self.ncdim_obj, key="nyp", value=(ny + 1)
+            )
 
     def prepare_ncfile(self: GridSpec) -> None:
         """

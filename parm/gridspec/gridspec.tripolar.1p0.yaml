@@ -1,0 +1,53 @@
+# Define the netCDF-formatted output file to contain the gridspec
+# reduced-grid attributes.
+output_netcdf: /run/gridspec.tripolar.1p0.nc
+
+# ----
+
+# Define the Arakawa-type grid; a complete list of Arakawa-type grids
+# can be found here: https://tinyurl.com/arakawa-type-grids
+grid_type: C
+
+# ----
+
+# Define the latitude information attributes.
+latitude:
+
+     # Define the path to the netCDF-formatted file containing
+     # supergrid respective geographical coordinate values.
+     ncfile: /run/mom6_cice_grids/1p0/ocean_hgrid.nc
+
+     # Define the zonal-coordinate dimension name for the respective
+     # geographical coordinate variable.
+     ncxdim: nx
+
+     # Define the meridional-coordinate dimension name for the
+     # respective geographical coordinate variable.
+     ncydim: ny
+
+     # Define the netCDF-formatted file variable name for the
+     # respective geographical coordinate.
+     ncvarname: y
+
+# ----
+     
+# Define the longitude information attributes.
+longitude:
+
+     # Define the path to the netCDF-formatted file containing
+     # supergrid respective geographical coordinate values.
+     ncfile: /run/mom6_cice_grids/1p0/ocean_hgrid.nc
+
+     # Define the zonal-coordinate dimension name for the respective
+     # geographical coordinate variable.
+     ncxdim: nx
+
+     # Define the meridional-coordinate dimension name for the
+     # respective geographical coordinate variable.
+     ncydim: ny
+
+     # Define the netCDF-formatted file variable name for the
+     # respective geographical coordinate.
+     ncvarname: x
+     
+
