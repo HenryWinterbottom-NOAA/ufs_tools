@@ -65,7 +65,6 @@ History
 # ----
 
 import numpy
-
 from exceptions import GridSpecError
 from tools import parser_interface
 
@@ -113,8 +112,7 @@ class ArakawaC(GridSpec):
 
         # Define the reduced grid dimension attributes accordingly.
         if self.is_tripolar:
-            (adims, qdims, tdims, udims, vdims) = [
-                ["ny", "nx"] for i in range(5)]
+            (adims, qdims, tdims, udims, vdims) = [["ny", "nx"] for i in range(5)]
 
         if not self.is_tripolar:
             adims = ["nyp", "nxp"]
@@ -256,8 +254,7 @@ class ArakawaC(GridSpec):
         for reduce_grid in self.reduce_grid_list:
 
             self.reduce_grid_obj = parser_interface.object_setattr(
-                object_in=self.reduce_grid_obj, key=reduce_grid, value=eval(
-                    reduce_grid)
+                object_in=self.reduce_grid_obj, key=reduce_grid, value=eval(reduce_grid)
             )
 
         # Define the netCDF grid-coordinate dimensions; proceed
