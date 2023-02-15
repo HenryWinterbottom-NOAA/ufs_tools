@@ -61,8 +61,10 @@ History
 
 # ----
 
-import os
 from dataclasses import dataclass
+import os
+from typing import Tuple, Union
+
 
 import numpy
 from confs.yaml_interface import YAML
@@ -116,10 +118,11 @@ class GridSpec:
 
         self.yaml_dict = YAML().read_yaml(yaml_file=self.yaml_file)
 
-        self.grid_attr_list = ["latitude", "longitude"]
+        self.grid_attr_list = ["angle", "latitude", "longitude"]
 
         self.reduce_grid_obj = parser_interface.object_define()
         self.reduce_grid_list = [
+            "angle",
             "qlat",
             "qlon",
             "tlat",
@@ -289,7 +292,8 @@ class GridSpec:
 
         return ncvar_obj
 
-    def wrap_lons(self, lons: numpy.array) -> numpy.array:
+    def wrap_lons(self, lons: numpy.array, angle: numpy.array =
+                  None) -> Tuple[numpy.array, Union[numpy.array, None]]:
         """
         Description
         -----------
@@ -304,6 +308,13 @@ class GridSpec:
         lons: numpy.array
 
             A Python numpy.array containing longitude values.
+
+        Keywords
+        --------
+
+        angle: numpy.array
+
+            ----
 
         Returns
         -------
@@ -322,7 +333,10 @@ class GridSpec:
         lons = numpy.where((lons > scale), (scale - lons), lons)
         lons = numpy.where((lons < 0.0), (lons + scale), lons)
 
-        return lons
+        if angle is not None:
+            angle = -1.0*angle
+
+        return (lons, angle)
 
     def write_ncfile(self) -> None:
         """

@@ -64,6 +64,8 @@ History
 
 # ----
 
+import numpy
+
 from exceptions import GridSpecError
 from tools import parser_interface
 
@@ -111,9 +113,11 @@ class ArakawaC(GridSpec):
 
         # Define the reduced grid dimension attributes accordingly.
         if self.is_tripolar:
-            (qdims, tdims, udims, vdims) = [["ny", "nx"] for i in range(4)]
+            (adims, qdims, tdims, udims, vdims) = [
+                ["ny", "nx"] for i in range(5)]
 
         if not self.is_tripolar:
+            adims = ["nyp", "nxp"]
             qdims = ["nyp", "nxp"]
             tdims = ["ny", "nx"]
             udims = ["ny", "nxp"]
@@ -121,6 +125,11 @@ class ArakawaC(GridSpec):
 
         # Define the reduced grid variable attributes.
         self.reduce_grid_dict = {
+            "angle": {
+                "dims": adims,
+                "desc": "Grid projection rotation angle; radians.",
+                "type": "float64",
+            },
             "qlat": {
                 "dims": qdims,
                 "desc": "Array of q-grid latitudes; degrees north.",
@@ -178,6 +187,23 @@ class ArakawaC(GridSpec):
 
         """
 
+        # Define the grid projection orientation angle values using
+        # the supergrid; proceed accordingly.
+        if self.is_tripolar:
+            angle = self.grids_obj.angle.ncvalues[2::2, 2::2]
+            qlat = self.grids_obj.latitude.ncvalues[2::2, 2::2]
+            qlon = self.grids_obj.longitude.ncvalues[2::2, 2::2]
+
+        if not self.is_tripolar:
+            angle = self.grids_obj.angle.ncvalues[::2, ::2]
+            qlat = self.grids_obj.latitude.ncvalues[::2, ::2]
+            qlon = self.grids_obj.longitude.ncvalues[::2, ::2]
+
+        angle = numpy.radians(angle)
+
+        if self.is_wrap_lons:
+            qlon = self.wrap_lons(lons=qlon)
+
         # Define the grid-cell corner point geographical coordinate
         # values using the supergrid; proceed accordingly.
         if self.is_tripolar:
@@ -189,7 +215,7 @@ class ArakawaC(GridSpec):
             qlon = self.grids_obj.longitude.ncvalues[::2, ::2]
 
         if self.is_wrap_lons:
-            qlon = self.wrap_lons(lons=qlon)
+            (qlon, angle) = self.wrap_lons(lons=qlon, angle=angle)
 
         # Define the mass variable geographical grid coordinate
         # values using the supergrid; proceed accordingly.
@@ -197,7 +223,7 @@ class ArakawaC(GridSpec):
         tlon = self.grids_obj.longitude.ncvalues[1::2, 1::2]
 
         if self.is_wrap_lons:
-            tlon = self.wrap_lons(lons=tlon)
+            (tlon, _) = self.wrap_lons(lons=tlon)
 
         # Define the zonal-velocity variable geographical coordinate
         # values using the supergrid; proceed accordingly.
@@ -210,7 +236,7 @@ class ArakawaC(GridSpec):
             ulon = self.grids_obj.longitude.ncvalues[1::2, ::2]
 
         if self.is_wrap_lons:
-            ulon = self.wrap_lons(lons=ulon)
+            (ulon, _) = self.wrap_lons(lons=ulon)
 
         # Define the meridional-velocity variable geographical
         # coordinate values using the supergrid; proceed accordingly.
@@ -223,14 +249,15 @@ class ArakawaC(GridSpec):
             vlon = self.grids_obj.longitude.ncvalues[::2, 1::2]
 
         if self.is_wrap_lons:
-            vlon = self.wrap_lons(lons=vlon)
+            (vlon, _) = self.wrap_lons(lons=vlon)
 
         # Update the base-class attribute containing the reduced grid
         # attributes.
         for reduce_grid in self.reduce_grid_list:
 
             self.reduce_grid_obj = parser_interface.object_setattr(
-                object_in=self.reduce_grid_obj, key=reduce_grid, value=eval(reduce_grid)
+                object_in=self.reduce_grid_obj, key=reduce_grid, value=eval(
+                    reduce_grid)
             )
 
         # Define the netCDF grid-coordinate dimensions; proceed
