@@ -61,10 +61,9 @@ History
 
 # ----
 
-from dataclasses import dataclass
 import os
+from dataclasses import dataclass
 from typing import Tuple, Union
-
 
 import numpy
 from confs.yaml_interface import YAML
@@ -292,8 +291,9 @@ class GridSpec:
 
         return ncvar_obj
 
-    def wrap_lons(self, lons: numpy.array, angle: numpy.array =
-                  None) -> Tuple[numpy.array, Union[numpy.array, None]]:
+    def wrap_lons(
+        self, lons: numpy.array, angle: numpy.array = None
+    ) -> Tuple[numpy.array, Union[numpy.array, None]]:
         """
         Description
         -----------
@@ -334,7 +334,7 @@ class GridSpec:
         lons = numpy.where((lons < 0.0), (lons + scale), lons)
 
         if angle is not None:
-            angle = -1.0*angle
+            angle = -1.0 * angle
 
         return (lons, angle)
 
