@@ -67,7 +67,7 @@ History
 import gridfill
 import numpy
 
-from remap import Remap
+from remapper.remap import Remap
 
 # ----
 

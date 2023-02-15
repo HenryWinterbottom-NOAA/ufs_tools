@@ -67,10 +67,10 @@ History
 import numpy
 import xesmf
 from exceptions import RemapperError
-from remapio import xarray_interface
+from remapper.remapio import xarray_interface
 from tools import fileio_interface, parser_interface
 
-from remap import Remap
+from remapper.remap import Remap
 
 # ----
 
