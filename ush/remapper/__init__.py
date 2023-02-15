@@ -54,7 +54,7 @@ class Remapper:
         # Define the available remapping attributes.
         self.interp_schemes = ["esmf"]
         self.grid_types_list = ['mass', 'uvel', 'vvel']
-        self.grid_items_list = ['arakawa', 'ncfile']
+        self.grid_items_list = ['arakawa', 'mask_ncfile', 'ncfile']
         self.coord_types_list = ['nclat', 'nclon']
 
         # Define the supported forecast model remapping applications.
@@ -387,7 +387,7 @@ class Remapper:
                                            remap_obj=self.remap_obj,
                                            varinfo_obj=self.varinfo_obj)
             forecast_model_obj.run()
-            
+
         else:
             msg = (f"The forecast model {self.forecast_model} is not supported. "
                    "Aborting!!!")
@@ -398,6 +398,6 @@ class Remapper:
         self.srcgrid_obj = self.getgrid_info(grid_name="source")
         self.dstgrid_obj = self.getgrid_info(grid_name="destination")
         self.remap_obj = self.getremap_info()
-        (self.variable_info, self.soca_varinfo_obj) = self.getvar_info()
+        (self.varinfo_obj, self.soca_varinfo_obj) = self.getvar_info()
 
         self.remap()

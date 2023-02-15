@@ -155,8 +155,12 @@ class Models:
                                           ncvarname="sfc", squeeze=True, axis=0)
         sfc = numpy.where(landmask_obj.dstgrid_mask[0, :, :] > 0, sfc, 0.0)
         var_obj = self.build_varobj(ncvarname="sfc")
-        xarray_interface.write(ncfile=output_netcdf, ncvarname="h", squeeze=True,
-                               axis=0)
+
+        xarray_interface.write(ncfile=output_netcdf,
+                               var_obj=var_obj, var_arr=sfc)
+
+        # xarray_interface.write(ncfile=output_netcdf, ncvarname="h", squeeze=True,
+        #                       axis=0)
 
         # Adjust the interpolated variable thickness profile with
         # respect to the destination grid bathymetry.
@@ -852,14 +856,25 @@ class Models:
 
         """
         landmask_obj = parser_interface.object_define()
+#        kwargs = {'object_in': srcgrid_obj,
+#                  'key': 'ncfile', 'force': True}
+#        ncfile = parser_interface.object_getattr(**kwargs)
+#        if ncfile is None:
+#            msg = ('The grid containing the source grid attributes could not be '
+#                   'determined from the user experiment configuration. Aborting!!!')
+#            raise RemapperError(msg=msg)
+        #kwargs = {'ncfile': ncfile, 'ncvarname': 'wet'}
+
         kwargs = {'object_in': srcgrid_obj,
-                  'key': 'ncfile', 'force': True}
-        ncfile = parser_interface.object_getattr(**kwargs)
-        if ncfile is None:
+                  'key': 'mask_ncfile', 'force': True}
+        mask_ncfile = parser_interface.object_getattr(**kwargs)
+
+        if mask_ncfile is None:
             msg = ('The grid containing the source grid attributes could not be '
                    'determined from the user experiment configuration. Aborting!!!')
             raise RemapperError(msg=msg)
-        kwargs = {'ncfile': ncfile, 'ncvarname': 'wet'}
+
+        kwargs = {'ncfile': mask_ncfile, 'ncvarname': 'mask'}
         srcgrid_mask_obj = xarray_interface.read(**kwargs)
         msg = ('Resetting/updating values within source grid land mask.')
         self.logger.info(msg=msg)
@@ -871,7 +886,17 @@ class Models:
             msg = ('The grid containing the destination grid attributes could not be '
                    'determined from the user experiment configuration. Aborting!!!')
             raise RemapperError(msg=msg)
-        kwargs = {'ncfile': ncfile, 'ncvarname': 'wet'}
+
+        kwargs = {'object_in': dstgrid_obj,
+                  'key': 'mask_ncfile', 'force': True}
+        mask_ncfile = parser_interface.object_getattr(**kwargs)
+
+        if mask_ncfile is None:
+            msg = ('The grid containing the source grid attributes could not be '
+                   'determined from the user experiment configuration. Aborting!!!')
+            raise RemapperError(msg=msg)
+
+        kwargs = {'ncfile': mask_ncfile, 'ncvarname': 'mask'}
         dstgrid_mask_obj = xarray_interface.read(**kwargs)
         msg = ('Resetting/updating values within destination grid land mask.')
         self.logger.info(msg=msg)
@@ -1060,7 +1085,7 @@ class Models:
             varobj = xarray_interface.varobj(**kwargs)
             varobj_list.append(varobj)
         kwargs = {'ncfile': output_netcdf, 'varobj_list': varobj_list,
-                  'unlimitdim': 'Time', 'variable_list': variable_list}
+                  'unlimitdim': 'Time'}  # , 'variable_list': variable_list}
         xarray_interface.dataset(**kwargs)
         kwargs = {'ncfile': output_netcdf, 'ncvarname': 'lonq',
                   'ncvar': dims_obj.lonu}
@@ -1659,6 +1684,9 @@ class Models:
             msg = ('The netCDF file containing the rotation angle could not be '
                    'be determined from the user experiment configuration. Aborting!!!')
             raise RemapperError(msg=msg)
+
+        return ucurr, vcurr
+
         kwargs = {'ncfile': ncfile, 'ncvarname': 'anglet'}
         anglet = netcdf4_interface.ncreadvar(**kwargs)
         if earth_rel:

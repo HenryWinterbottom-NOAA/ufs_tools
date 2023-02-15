@@ -64,6 +64,8 @@ History
 
 # ----
 
+from dataclasses import dataclass
+
 import gridfill
 import numpy
 
@@ -78,6 +80,7 @@ __email__ = "henry.winterbottom@noaa.gov"
 # ----
 
 
+@dataclass
 class MaskUpdate(Remap):
     """
     Description
@@ -99,7 +102,7 @@ class MaskUpdate(Remap):
         """
 
         # Define the base-class attributes.
-        super().__init__(self)
+        super().__init__()
 
     def grid_fill(
         self: Remap,
@@ -240,7 +243,8 @@ class MaskUpdate(Remap):
         # Update the interpolated variable relative to the destination
         # grid land/sea masks.
         outvar = self.grid_fill(
-            invar=invar, mask_obj=mask_obj, zdim_name=zdim_name**gridfill_kwargs
+            invar=invar, mask_obj=mask_obj, zdim_name=zdim_name,
+            **gridfill_kwargs
         )
 
         return outvar

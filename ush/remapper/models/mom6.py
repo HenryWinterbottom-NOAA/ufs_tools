@@ -123,7 +123,7 @@ class MOM6(Models):
         """
 
         # Define the base-class attributes.
-        super().__init__(self)
+        super().__init__()
 
         [self.dstgrid_obj, self.remap_obj, self.srcgrid_obj, self.varinfo_obj] = \
             [dstgrid_obj, remap_obj, srcgrid_obj, varinfo_obj]
@@ -360,7 +360,7 @@ class MOM6(Models):
 
         # Collect the momentum (e.g., current velocity) variable
         # attributes.
-        dst_var_obj = self.__get_uv_vars__()
+        dst_var_obj = self.__get_uvvars__()
 
         # Remap the respective source grid momentum variables to the
         # destination grid mass point locations.
@@ -408,7 +408,7 @@ class MOM6(Models):
             self.logger.info(msg=msg)
             outvar = self.remap_app(invar=invar, interp_type="bilinear",
                                     srcgrid_stagger=grid_stagger, dstgrid_stagger="mass", dstgrid_obj=self.srcgrid_obj,
-                                    srcgrids_obj=self.srcgrid_obj, remap_obj=self.remap_obj,
+                                    srcgrid_obj=self.srcgrid_obj, remap_obj=self.remap_obj,
                                     reuse_weights=True, src2src=True)
 
             if dst_ncvarname.lower() == 'u':
@@ -443,4 +443,4 @@ class MOM6(Models):
         self.regrid_massvars()
         self.bathy_adjust(bathy_obj=self.bathy_obj,
                           landmask_obj=self.landmask_obj, output_netcdf=self.output_netcdf)
-        self.regrid_momentumvars(**kwargs)
+        # self.regrid_momentumvars()

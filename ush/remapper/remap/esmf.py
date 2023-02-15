@@ -121,7 +121,7 @@ class ESMF(Remap):
         """
 
         # Define the base-class attributes.
-        super().__init__(self)
+        super().__init__()
         self.dstgrid_obj = dstgrid_obj
         self.remap_obj = remap_obj
         self.srcgrid_obj = srcgrid_obj
