@@ -55,6 +55,10 @@ History
 
 # ----
 
+# pylint: disable=too-many-instance-attributes
+
+# ----
+
 from typing import Tuple
 
 import numpy
@@ -111,8 +115,13 @@ class MOM6(Ocean):
 
     """
 
-    def __init__(self: Ocean, srcgrid_obj: object, dstgrid_obj: object,
-                 remap_obj: object, varinfo_obj: object):
+    def __init__(
+        self: Ocean,
+        srcgrid_obj: object,
+        dstgrid_obj: object,
+        remap_obj: object,
+        varinfo_obj: object,
+    ):
         """
         Description
         -----------
@@ -124,40 +133,52 @@ class MOM6(Ocean):
         # Define the base-class attributes.
         super().__init__()
 
-        [self.dstgrid_obj, self.remap_obj, self.srcgrid_obj, self.varinfo_obj] = \
-            [dstgrid_obj, remap_obj, srcgrid_obj, varinfo_obj]
+        [self.dstgrid_obj, self.remap_obj, self.srcgrid_obj, self.varinfo_obj] = [
+            dstgrid_obj,
+            remap_obj,
+            srcgrid_obj,
+            varinfo_obj,
+        ]
         self.interp_scheme = self.remap_obj.interp_scheme.lower()
         self.nlevs = self.remap_obj.nlevs
 
         self.output_netcdf = parser_interface.object_getattr(
-            object_in=self.dstgrid_obj, key="output_netcdf")
+            object_in=self.dstgrid_obj, key="output_netcdf"
+        )
 
         self.variable_list = parser_interface.object_getattr(
-            object_in=self.varinfo_obj, key="variable_list", force=True)
+            object_in=self.varinfo_obj, key="variable_list", force=True
+        )
         if self.variable_list is None:
-            msg = ('The formatted list containing the list of variables '
-                   'within the user experiment configuration which to '
-                   'be interpolated (regridded) could not be determined '
-                   'from the user experiment configuration. Aborting!!!')
+            msg = (
+                "The formatted list containing the list of variables "
+                "within the user experiment configuration which to "
+                "be interpolated (regridded) could not be determined "
+                "from the user experiment configuration. Aborting!!!"
+            )
             raise RemapperError(msg=msg)
 
         # Initialize all regridding/remapping objects.
         self.maskupdate = maskupdate.MaskUpdate()
 
-        self.remap_app = self.get_interpscheme(
-            interp_scheme=self.interp_scheme)
+        self.remap_app = self.get_interpscheme(interp_scheme=self.interp_scheme)
 
         self.bathy_obj = self.build_bathy(varinfo_obj=self.varinfo_obj)
 
         self.landmask_obj = self.build_mom6_landmask(
-            srcgrid_obj=self.srcgrid_obj, dstgrid_obj=self.dstgrid_obj,
-            remap_obj=self.remap_obj, nlevs=self.nlevs)
+            srcgrid_obj=self.srcgrid_obj,
+            dstgrid_obj=self.dstgrid_obj,
+            remap_obj=self.remap_obj,
+            nlevs=self.nlevs,
+        )
 
-        self.build_mom6_ncoutput(dstgrid_obj=self.dstgrid_obj,
-                                 varinfo_obj=self.varinfo_obj,
-                                 nlevs=self.nlevs,
-                                 variable_list=self.variable_list,
-                                 output_netcdf=self.output_netcdf)
+        self.build_mom6_ncoutput(
+            dstgrid_obj=self.dstgrid_obj,
+            varinfo_obj=self.varinfo_obj,
+            nlevs=self.nlevs,
+            variable_list=self.variable_list,
+            output_netcdf=self.output_netcdf,
+        )
 
     def get_uvvars(self: Ocean) -> object:
         """
@@ -180,7 +201,7 @@ class MOM6(Ocean):
 
         # Define the velocity vector components.
         dst_var_obj = parser_interface.object_define()
-        dst_ncvarname_list = ['u', 'v']
+        dst_ncvarname_list = ["u", "v"]
 
         # Loop through each variable and remap accordingly.
         for variable in self.variable_list:
@@ -188,16 +209,19 @@ class MOM6(Ocean):
             # Define the attributes for the respective variable;
             # proceed accordingly.
             varinfo_dict = parser_interface.object_getattr(
-                object_in=self.varinfo_obj, key=variable, force=True)
+                object_in=self.varinfo_obj, key=variable, force=True
+            )
             if varinfo_dict is None:
-                msg = (f'The attributes for variable {variable} could not be '
-                       'determined from the user experiment configuration. '
-                       'Aborting!!!')
+                msg = (
+                    f"The attributes for variable {variable} could not be "
+                    "determined from the user experiment configuration. "
+                    "Aborting!!!"
+                )
                 raise RemapperError(msg=msg)
 
             dst_ncvarname = parser_interface.dict_key_value(
-                dict_in=varinfo_dict, key="dst_ncvarname", force=True,
-                no_split=True)
+                dict_in=varinfo_dict, key="dst_ncvarname", force=True, no_split=True
+            )
 
             # Build a Python dictionary containing the attributes for
             # the respective momentum (e.g., current velocity)
@@ -207,35 +231,41 @@ class MOM6(Ocean):
                 # Read the variable from the netCDF-formatted input
                 # file.
                 dst_vardict = {}
-                msg = f'Reading MOM6 momentum variable {dst_ncvarname}.'
+                msg = f"Reading MOM6 momentum variable {dst_ncvarname}."
                 self.logger.info(msg=msg)
 
-                (ncattr_obj, varattr_obj) = self.build_mom6_varattrobjs(
-                    varinfo_dict=varinfo_dict)
+                (ncattr_obj, _) = self.build_mom6_varattrobjs(varinfo_dict=varinfo_dict)
                 ncvar = netcdf4_interface.ncreadvar(
-                    ncfile=ncattr_obj.ncfilename, ncvarname=ncattr_obj.src_ncvarname,
-                    squeeze=True, axis=0)
-                dst_vardict['ncvar'] = ncvar
+                    ncfile=ncattr_obj.ncfilename,
+                    ncvarname=ncattr_obj.src_ncvarname,
+                    squeeze=True,
+                    axis=0,
+                )
+                dst_vardict["ncvar"] = ncvar
 
                 # Define the grid-type staggering for the respective
                 # variable.
                 grid_stagger = parser_interface.dict_key_value(
-                    dict_in=varinfo_dict, key="grid_stagger", force=True, no_split=True)
+                    dict_in=varinfo_dict, key="grid_stagger", force=True, no_split=True
+                )
                 if grid_stagger is None:
-                    msg = ('The grid staggering attributes for MOM6 momentum '
-                           f'variable {dst_ncvarname} could not be determined from the user '
-                           'experiment configuration. Aborting!!!')
+                    msg = (
+                        "The grid staggering attributes for MOM6 momentum "
+                        f"variable {dst_ncvarname} could not be determined from the user "
+                        "experiment configuration. Aborting!!!"
+                    )
                     raise RemapperError(msg=msg)
 
-                dst_vardict['grid_stagger'] = grid_stagger
+                dst_vardict["grid_stagger"] = grid_stagger
                 dst_var_obj = parser_interface.object_setattr(
-                    object_in=dst_var_obj, key=dst_ncvarname, value=dst_vardict)
+                    object_in=dst_var_obj, key=dst_ncvarname, value=dst_vardict
+                )
 
         return dst_var_obj
 
-    def mass2uv(self: Ocean, ucurr: numpy.array, vcurr: numpy.array,
-                grid_obj: object) -> Tuple[numpy.array, numpy.array] -> \
-            Tuple[numpy.array, numpy.array]:
+    def mass2uv(
+        self: Ocean, ucurr: numpy.array, vcurr: numpy.array, grid_obj: object
+    ) -> Tuple[numpy.array, numpy.array]:
         """
         Description
         -----------
@@ -266,13 +296,13 @@ class MOM6(Ocean):
         Returns
         -------
 
-        u: array-type
+        ucurr: array-type
 
             A Python array type containing the zonal velocity vector
             component remapped to the respective staggered-grid
             locations.
 
-        v: array-type
+        vcurr: array-type
 
             A Python array type containing the meridional velocity
             vector component remapped to the respective staggered-grid
@@ -282,19 +312,37 @@ class MOM6(Ocean):
 
         # Remap the velocity vector components from the mass grid to
         # the respective staggered grid locations.
-        msg = ('Regridding MOM6 current velocity vector components from mass variable '
-               'locations to the respective staggered grid points locations.')
+        msg = (
+            "Regridding MOM6 current velocity vector components from mass variable "
+            "locations to the respective staggered grid points locations."
+        )
         self.logger.info(msg=msg)
 
-        u = self.remap_app(invar=ucurr, interp_type="bilinear", srcgrid_stagger="mass",
-                           dstgrid_stagger="uvel", dstgrid_obj=grid_obj, srcgrid_obj=grid_obj,
-                           remap_obj=self.remap_obj, reuse_weights=True, dst2dst=True)
+        ucurr = self.remap_app(
+            invar=ucurr,
+            interp_type="bilinear",
+            srcgrid_stagger="mass",
+            dstgrid_stagger="uvel",
+            dstgrid_obj=grid_obj,
+            srcgrid_obj=grid_obj,
+            remap_obj=self.remap_obj,
+            reuse_weights=True,
+            dst2dst=True,
+        )
 
-        v = self.remap_app(invar=vcurr, interp_type="bilinear", srcgrid_stagger="mass",
-                           dstgrid_stagger="vvel", dstgrid_obj=grid_obj, srcgrid_obj=grid_obj,
-                           remap_obj=self.remap_obj, reuse_weights=True, dst2dst=True)
+        vcurr = self.remap_app(
+            invar=vcurr,
+            interp_type="bilinear",
+            srcgrid_stagger="mass",
+            dstgrid_stagger="vvel",
+            dstgrid_obj=grid_obj,
+            srcgrid_obj=grid_obj,
+            remap_obj=self.remap_obj,
+            reuse_weights=True,
+            dst2dst=True,
+        )
 
-        return (u, v)
+        return (ucurr, vcurr)
 
     def regrid_massvars(self: Ocean) -> None:
         """
@@ -319,7 +367,7 @@ class MOM6(Ocean):
         """
 
         # Regrid the mass-variables; proceed accordingly.
-        msg = ('Regridding variables defined on the Arakawa mass grid.')
+        msg = "Regridding variables defined on the Arakawa mass grid."
         self.logger.info(msg=msg)
 
         # Loop through each variable and remap accordingly.
@@ -328,62 +376,83 @@ class MOM6(Ocean):
             # Define the attributes for the respective variable;
             # proceed accordingly.
             varinfo_dict = parser_interface.object_getattr(
-                object_in=self.varinfo_obj, key=variable, force=True)
+                object_in=self.varinfo_obj, key=variable, force=True
+            )
             if varinfo_dict is None:
-                msg = (f'The attributes for variable {variable} could not be '
-                       f'determined from the experiment configuration file {self.yaml_file}. '
-                       'Aborting!!!')
+                msg = (
+                    f"The attributes for variable {variable} could not be "
+                    "determined from the experiment configuration file. "
+                    "Aborting!!!"
+                )
                 raise RemapperError(msg=msg)
 
             grid_stagger = parser_interface.dict_key_value(
-                dict_in=varinfo_dict, key="grid_stagger", force=True, no_split=True)
+                dict_in=varinfo_dict, key="grid_stagger", force=True, no_split=True
+            )
 
             # If the grid-staggering is for a variable defined at the
             # respective grid-type mass locations, proceed
             # accordingly.
-            if grid_stagger.lower() == 'mass':
-                msg = f'Preparing to regrid variable {variable}.'
+            if grid_stagger.lower() == "mass":
+                msg = f"Preparing to regrid variable {variable}."
                 self.logger.info(msg=msg)
 
                 (ncattr_obj, varattr_obj) = self.build_mom6_varattrobjs(
-                    varinfo_dict=varinfo_dict)
-                msg = (f'Regridding variable {variable} using interpolation '
-                       f'type {varattr_obj.interp_type}.')
+                    varinfo_dict=varinfo_dict
+                )
+                msg = (
+                    f"Regridding variable {variable} using interpolation "
+                    f"type {varattr_obj.interp_type}."
+                )
                 self.logger.info(msg=msg)
 
                 # Read the variable from the netCDF-formatted input
                 # file.
-                ncvar = netcdf4_interface.ncreadvar(ncfile=ncattr_obj.ncfilename,
-                                                    ncvarname=ncattr_obj.src_ncvarname,
-                                                    squeeze=True, axis=0)
+                ncvar = netcdf4_interface.ncreadvar(
+                    ncfile=ncattr_obj.ncfilename,
+                    ncvarname=ncattr_obj.src_ncvarname,
+                    squeeze=True,
+                    axis=0,
+                )
 
-                invar = numpy.where(ncvar >= 1.e10, 0.0, ncvar)
+                invar = numpy.where(ncvar >= 1.0e10, 0.0, ncvar)
 
                 # Remap the source variable to the destination grid
                 # projection.
-                outvar = self.remap_app(invar=invar, interp_type=varattr_obj.interp_type,
-                                        srcgrid_stagger=varattr_obj.grid_stagger,
-                                        dstgrid_stagger=varattr_obj.grid_stagger,
-                                        dstgrid_obj=self.dstgrid_obj,
-                                        srcgrid_obj=self.srcgrid_obj, remap_obj=self.remap_obj)
+                outvar = self.remap_app(
+                    invar=invar,
+                    interp_type=varattr_obj.interp_type,
+                    srcgrid_stagger=varattr_obj.grid_stagger,
+                    dstgrid_stagger=varattr_obj.grid_stagger,
+                    dstgrid_obj=self.dstgrid_obj,
+                    srcgrid_obj=self.srcgrid_obj,
+                    remap_obj=self.remap_obj,
+                )
 
                 # Update the remapped variable relative to the
                 # destination grid landmask.
-                msg = f'Preparing to update variable {variable} relative to the specified landmask.'
+                msg = f"Preparing to update variable {variable} relative to the specified landmask."
                 self.logger.info(msg=msg)
 
-                outvar = self.maskupdate.run(invar=outvar, mask_obj=self.landmask_obj,
-                                             zdim_name=varattr_obj.zdim_name, **self.gridfill_kwargs)
+                outvar = self.maskupdate.run(
+                    invar=outvar,
+                    mask_obj=self.landmask_obj,
+                    zdim_name=varattr_obj.zdim_name,
+                    **self.gridfill_kwargs,
+                )
 
                 # Write the interpolated variable to the output
                 # netCDF-formatted file path.
-                msg = (f'Writing interpolated variable {variable} to output netCDF file '
-                       f'{self.dstgrid_obj.output_netcdf}.')
+                msg = (
+                    f"Writing interpolated variable {variable} to output netCDF file "
+                    f"{self.dstgrid_obj.output_netcdf}."
+                )
                 self.logger.info(msg=msg)
 
                 var_obj = self.build_varobj(ncvarname=ncattr_obj.dst_ncvarname)
-                xarray_interface.write(ncfile=self.output_netcdf, var_obj=var_obj,
-                                       var_arr=outvar)
+                xarray_interface.write(
+                    ncfile=self.output_netcdf, var_obj=var_obj, var_arr=outvar
+                )
 
     def regrid_momentumvars(self: Ocean) -> None:
         """
@@ -436,46 +505,63 @@ class MOM6(Ocean):
 
         # Rotate the velocity vector components to Earth relative
         # components.
-        (ucurr, vcurr) = self.rotate_currents(grid_obj=self.srcgrid_obj,
-                                              ucurr=umass, vcurr=vmass,
-                                              earth_rel=True)
+        (ucurr, vcurr) = self.rotate_currents(
+            grid_obj=self.srcgrid_obj, ucurr=umass, vcurr=vmass, earth_rel=True
+        )
 
         # Interpolate the velocity vector components, defined at the
         # source grid mass points, to the destination grid mass
         # points.
-        umass = self.remap_app(invar=ucurr, interp_type="bilinear", srcgrid_stagger="mass",
-                               dstgrid_stagger="mass", dstgrid_obj=self.dstgrid_obj,
-                               srcgrid_obj=self.srcgrid_obj, remap_obj=self.remap_obj,
-                               reuse_weights=True)
-        vmass = self.remap_app(invar=vcurr, interp_type="bilinear", srcgrid_stagger="mass",
-                               dstgrid_stagger="mass", dstgrid_obj=self.dstgrid_obj,
-                               srcgrid_obj=self.srcgrid_obj, remap_obj=self.remap_obj,
-                               reuse_weights=True)
+        umass = self.remap_app(
+            invar=ucurr,
+            interp_type="bilinear",
+            srcgrid_stagger="mass",
+            dstgrid_stagger="mass",
+            dstgrid_obj=self.dstgrid_obj,
+            srcgrid_obj=self.srcgrid_obj,
+            remap_obj=self.remap_obj,
+            reuse_weights=True,
+        )
+        vmass = self.remap_app(
+            invar=vcurr,
+            interp_type="bilinear",
+            srcgrid_stagger="mass",
+            dstgrid_stagger="mass",
+            dstgrid_obj=self.dstgrid_obj,
+            srcgrid_obj=self.srcgrid_obj,
+            remap_obj=self.remap_obj,
+            reuse_weights=True,
+        )
 
         # Rotate the velocity vector components to grid relative
         # components.
-        (ucurr, vcurr) = self.rotate_currents(grid_obj=self.dstgrid_obj,
-                                              ucurr=umass, vcurr=vmass,
-                                              grid_rel=True)
+        (ucurr, vcurr) = self.rotate_currents(
+            grid_obj=self.dstgrid_obj, ucurr=umass, vcurr=vmass, grid_rel=True
+        )
 
         # Interpolate the destination grid current velocity vector
         # components from the mass point locations to the respective
         # staggered locations.
-        (ucurr, vcurr) = self.mass2uv(ucurr=ucurr,
-                                      vcurr=vcurr, grid_obj=self.dstgrid_obj)
+        (ucurr, vcurr) = self.mass2uv(
+            ucurr=ucurr, vcurr=vcurr, grid_obj=self.dstgrid_obj
+        )
 
         # Update the netCDF-formatted file path.
-        msg = ("Updating the current velocity vector components in "
-               f"{self.dstgrid_obj.output_netcdf}.")
+        msg = (
+            "Updating the current velocity vector components in "
+            f"{self.dstgrid_obj.output_netcdf}."
+        )
         self.logger.info(msg=msg)
 
         var_obj = self.build_varobj(ncvarname="u")
-        xarray_interface.write(ncfile=self.dstgrid_obj.output_netcdf,
-                               var_obj=var_obj, var_arr=ucurr)
+        xarray_interface.write(
+            ncfile=self.dstgrid_obj.output_netcdf, var_obj=var_obj, var_arr=ucurr
+        )
 
         var_obj = self.build_varobj(ncvarname="v")
-        xarray_interface.write(ncfile=self.dstgrid_obj.output_netcdf,
-                               var_obj=var_obj, var_arr=vcurr)
+        xarray_interface.write(
+            ncfile=self.dstgrid_obj.output_netcdf, var_obj=var_obj, var_arr=vcurr
+        )
 
     def uv2mass(self: Ocean, dst_var_obj: object) -> Tuple[numpy.array, numpy.array]:
         """
@@ -519,31 +605,39 @@ class MOM6(Ocean):
             # Collect the grid attributes for the respective velocity
             # vector component.
             dst_vardict = parser_interface.object_getattr(
-                object_in=dst_var_obj, key=dst_ncvarname)
+                object_in=dst_var_obj, key=dst_ncvarname
+            )
             grid_stagger = parser_interface.dict_key_value(
-                dict_in=dst_vardict, key="grid_stagger", no_split=True)
+                dict_in=dst_vardict, key="grid_stagger", no_split=True
+            )
 
             # Define the respective velocity component values at the
             # respective staggered-grid locations.
-            ncvar = parser_interface.dict_key_value(
-                dict_in=dst_vardict, key="ncvar")
-            invar = numpy.where(ncvar >= 1.e10, 0.0, ncvar)
+            ncvar = parser_interface.dict_key_value(dict_in=dst_vardict, key="ncvar")
+            invar = numpy.where(ncvar >= 1.0e10, 0.0, ncvar)
 
             # Remap the respective velocity component values from the
             # respective staggered-grid locations to the mass-grid
             # locations.
             msg = f"Regridding MOM6 momentum variable {dst_ncvarname.lower()}."
             self.logger.info(msg=msg)
-            outvar = self.remap_app(invar=invar, interp_type="bilinear",
-                                    srcgrid_stagger=grid_stagger, dstgrid_stagger="mass", dstgrid_obj=self.srcgrid_obj,
-                                    srcgrid_obj=self.srcgrid_obj, remap_obj=self.remap_obj,
-                                    reuse_weights=True, src2src=True)
+            outvar = self.remap_app(
+                invar=invar,
+                interp_type="bilinear",
+                srcgrid_stagger=grid_stagger,
+                dstgrid_stagger="mass",
+                dstgrid_obj=self.srcgrid_obj,
+                srcgrid_obj=self.srcgrid_obj,
+                remap_obj=self.remap_obj,
+                reuse_weights=True,
+                src2src=True,
+            )
 
             # Define the velocity vector component arrays accordingly.
-            if dst_ncvarname.lower() == 'u':
+            if dst_ncvarname.lower() == "u":
                 umass = outvar
 
-            if dst_ncvarname.lower() == 'v':
+            if dst_ncvarname.lower() == "v":
                 vmass = outvar
 
         return (umass, vmass)
@@ -576,8 +670,11 @@ class MOM6(Ocean):
 
         # Adjust the sea-surface heights and thickness profile
         # relative to the destination grid bathymetry.
-        self.bathy_adjust(bathy_obj=self.bathy_obj,
-                          landmask_obj=self.landmask_obj, output_netcdf=self.output_netcdf)
+        self.bathy_adjust(
+            bathy_obj=self.bathy_obj,
+            landmask_obj=self.landmask_obj,
+            output_netcdf=self.output_netcdf,
+        )
 
         # Remap the respective momentum variables accordingly.
         self.regrid_momentumvars()
