@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 import os
 
-from remapper.models.mom6 import MOM6
+from remapper.models.ocean.mom6 import MOM6
 
 from confs.yaml_interface import YAML
 
