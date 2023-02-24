@@ -54,7 +54,7 @@ class Remapper:
         # Define the available remapping attributes.
         self.interp_schemes = ["esmf"]
         self.grid_types_list = ['mass', 'uvel', 'vvel']
-        self.grid_items_list = ['arakawa', 'mask_ncfile', 'ncfile']
+        self.grid_items_list = ['arakawa', 'grid_ncfile', 'topo_ncfile']
         self.coord_types_list = ['nclat', 'nclon']
 
         # Define the supported forecast model remapping applications.
