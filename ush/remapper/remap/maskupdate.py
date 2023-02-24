@@ -92,7 +92,7 @@ class MaskUpdate(Remap):
 
     """
 
-    def __init__(self):
+    def __init__(self: Remap):
         """
         Description
         -----------
