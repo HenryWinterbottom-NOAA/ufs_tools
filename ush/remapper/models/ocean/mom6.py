@@ -59,7 +59,7 @@ History
 
 # ----
 
-from typing import Tuple
+from typing import Dict, List, Tuple
 
 import numpy
 from exceptions import RemapperError
@@ -67,7 +67,7 @@ from ioapps import netcdf4_interface
 from remapper.models.ocean import Ocean
 from remapper.remap import maskupdate
 from remapper.remapio import xarray_interface
-from tools import parser_interface
+from tools import fileio_interface, parser_interface
 
 # ----
 
@@ -161,24 +161,574 @@ class MOM6(Ocean):
         # Initialize all regridding/remapping objects.
         self.maskupdate = maskupdate.MaskUpdate()
 
-        self.remap_app = self.get_interpscheme(interp_scheme=self.interp_scheme)
+        self.remap_app = self.get_interpscheme(
+            interp_scheme=self.interp_scheme)
 
         self.bathy_obj = self.build_bathy(varinfo_obj=self.varinfo_obj)
 
-        self.landmask_obj = self.build_mom6_landmask(
+        self.landmask_obj = self.build_landmask(
             srcgrid_obj=self.srcgrid_obj,
             dstgrid_obj=self.dstgrid_obj,
             remap_obj=self.remap_obj,
             nlevs=self.nlevs,
         )
 
-        self.build_mom6_ncoutput(
+        self.build_ncoutput(
             dstgrid_obj=self.dstgrid_obj,
             varinfo_obj=self.varinfo_obj,
             nlevs=self.nlevs,
             variable_list=self.variable_list,
             output_netcdf=self.output_netcdf,
         )
+
+    def build_cfmetadata(self: Ocean, grid_obj: object, dstgrid_obj: object,
+                         nlevs: int) -> object:
+        """
+        Description
+        -----------
+
+        This method defines the dimension variable attributes for the
+        output netCDF formatted file assuming the CF metadata
+        conventions.
+
+        Parameters
+        ----------
+
+        grid_obj: object
+
+            A Python object containing the contents of a xarray
+            formatted dataset.
+
+        dstgrid_obj: object
+
+            A Python object containing the destination grid attributes
+            collected from the experiment configuration.
+
+        nlevs: int
+
+            A Python integer value specifying the total number of
+            unstaggered vertical levels for the MOM6 destination grid.
+
+        Returns
+        -------
+
+        dims_obj: object
+
+            A Python object containing the dimension variable
+            attributes for the output netCDF formatted file (assuming
+            the CF metadata convention).
+
+        Raises
+        ------
+
+        RemapperError:
+
+            * raised if the any of the mass-, zonal-velocity, and/or
+              meridional-velocity grids are not defined withih the
+              experiment configuration.
+
+            * raised if the coordinate variables netCDF-formatted file
+              variable names cannot be determined for the mass-,
+              zonal-velocity, and/or meridional-grids within the
+              experiment configuration.
+
+        """
+
+        # Define the attributes for the respective grid types.
+        (layers, time) = (numpy.zeros([nlevs]), numpy.zeros([1]))
+
+        mass_grid_dict = parser_interface.object_getattr(
+            object_in=dstgrid_obj, key="mass", force=True)
+        uvel_grid_dict = parser_interface.object_getattr(
+            object_in=dstgrid_obj, key="uvel", force=True)
+        vvel_grid_dict = parser_interface.object_getattr(
+            object_in=dstgrid_obj, key="vvel", force=True)
+
+        if any(item is None for item in
+               [mass_grid_dict, uvel_grid_dict, vvel_grid_dict]):
+            msg = ("A grid type (e.g., mass, uvel, or vvel) has not be specified "
+                   "in the experiment configuration. Aborting!!!"
+                   )
+            raise RemapperError(msg=msg)
+
+        # Define the mass grid type attributes; proceed accordingly.
+        nclat = parser_interface.dict_key_value(
+            dict_in=mass_grid_dict, key="nclat", force=True, no_split=True)
+        nclon = parser_interface.dict_key_value(
+            dict_in=mass_grid_dict, key="nclon", force=True, no_split=True)
+
+        if any(item is None for item in [nclat, nclon]):
+            msg = ("A coordinate variable (e.g., nclat or nclon)  could not be "
+                   "determined for the mass variable grid. Aborting!!!"
+                   )
+            raise RemapperError(msg=msg)
+
+        latm = parser_interface.object_getattr(
+            object_in=grid_obj, key=nclat).mean(axis=1).values
+        lonm = parser_interface.object_getattr(
+            object_in=grid_obj, key=nclon).mean(axis=0).values
+
+        # Define the zonal-velocity grid type attributes; proceed
+        # accordingly.
+        nclat = parser_interface.dict_key_value(
+            dict_in=uvel_grid_dict, key="nclat", force=True, no_split=True)
+        nclon = parser_interface.dict_key_value(
+            dict_in=uvel_grid_dict, key="nclon", force=True, no_split=True)
+
+        if any(item is None for item in [nclat, nclon]):
+            msg = ("A coordinate variable (e.g., nclat or nclon)  could not be "
+                   "determined for the zonal-velocity variable grid. Aborting!!!"
+                   )
+            raise RemapperError(msg=msg)
+
+        latu = parser_interface.object_getattr(
+            object_in=grid_obj, key=nclat).mean(axis=1).values
+        lonu = parser_interface.object_getattr(
+            object_in=grid_obj, key=nclon).mean(axis=0).values
+
+        # Define the meridional-velocity grid type attributes; proceed
+        # accordingly.
+        nclat = parser_interface.dict_key_value(
+            dict_in=vvel_grid_dict, key="nclat", force=True, no_split=True)
+        nclon = parser_interface.dict_key_value(
+            dict_in=vvel_grid_dict, key="nclon", force=True, no_split=True)
+
+        if any(item is None for item in [nclat, nclon]):
+            msg = ("A coordinate variable (e.g., nclat or nclon)  could not be "
+                   "determined for the meridional-velocity variable grid. Aborting!!!"
+                   )
+            raise RemapperError(msg=msg)
+
+        latv = parser_interface.object_getattr(
+            object_in=grid_obj, key=nclat).mean(axis=1).values
+        lonv = parser_interface.object_getattr(
+            object_in=grid_obj, key=nclon).mean(axis=0).values
+
+        # Build the Python object containing the dimension attributes.
+        dims_attrs_dict = {"latm": latm, "latu": latu, "latv": latv,
+                           "layers": layers, "lonm": lonm, "lonu": lonu, "lonv": lonv,
+                           "time": time
+                           }
+
+        dims_obj = parser_interface.object_define()
+
+        for dims_attr in dims_attrs_dict:
+            value = parser_interface.dict_key_value(
+                dict_in=dims_attrs_dict, key=dims_attr, no_split=True)
+            dims_obj = parser_interface.object_setattr(
+                object_in=dims_obj, key=dims_attr, value=value)
+
+        return dims_obj
+
+    def build_landmask(self: Ocean, srcgrid_obj: object, dstgrid_obj: object,
+                       remap_obj: object, nlevs: int) -> object:
+        """
+        Description
+        -----------
+
+        This method interpolates the source grid landmask to the
+        destination grid projection; the destination grid landmask is
+        also defined; this information is used to define a Python
+        object containing the respective interpolated source grid
+        landmask, the destination grid landmask, and the respective
+        dimensions for the destination grid landmask.
+
+        Parameters
+        ----------
+
+        dstgrid_obj: object
+
+            A Python object containing the destination grid attributes
+            collected from the experiment configuration.
+
+        srcgrid_obj: object
+
+            A Python object containing the source grid attributes
+            collected from the experiment configuration.
+
+        remap_obj: object
+
+            A Python object containing the interpolation (e.g.,
+            regridding) attributes collected from the experiment
+            configuration.
+
+        nlevs: int
+
+            A Python integer value specifying the total number of
+            unstaggered vertical levels for the MOM6 destination grid.
+
+        Returns
+        -------
+
+        landmask_obj: object
+
+            A Python object containing the interpolated source grid
+            landmask, the destination grid landmask, and the
+            destination landmask grid dimensions.
+
+        Raises
+        ------
+
+        RemapperError:
+
+            * raised if the source and/or destination grid topography
+              file (topo_ncfile) has not been defined within the
+              experiment configuration.
+
+        """
+
+        # Define the source and destination grid masks.
+        ncfile = parser_interface.object_getattr(
+            object_in=srcgrid_obj, key="topo_ncfile", force=True)
+        if ncfile is None:
+            msg = ("The source grid topography file (topo_ncfile) could not be "
+                   f"determined from configuration file {self.yaml_file}. "
+                   "Aborting!!!"
+                   )
+            raise RemapperError(msg=msg)
+
+        msg = f"Collecting the source grid mask from netCDF-formatted file {ncfile}."
+        self.logger.info(msg=msg)
+        srcgrid_mask_obj = xarray_interface.read(
+            ncfile=ncfile, ncvarname="wet")
+
+        ncfile = parser_interface.object_getattr(
+            object_in=dstgrid_obj, key="topo_ncfile", force=True)
+        if ncfile is None:
+            msg = ("The destination grid topography file (topo_ncfile) could not be "
+                   f"determined from configuration file {self.yaml_file}. "
+                   "Aborting!!!"
+                   )
+            raise RemapperError(msg=msg)
+
+        msg = f"Collecting the destination grid mask from netCDF-formatted file {ncfile}."
+        self.logger.info(msg=msg)
+        dstgrid_mask_obj = xarray_interface.read(
+            ncfile=ncfile, ncvarname="wet")
+
+        # Update the respective source and destination grid masks
+        # accordingly.
+        msg = 'Resetting/updating values within source grid land mask.'
+        self.logger.info(msg=msg)
+        srcgrid_mask = srcgrid_mask_obj.values
+        srcgrid_mask = numpy.where(srcgrid_mask > 0.0, 1.0, 0.0)
+
+        msg = ('Resetting/updating values within destination grid land mask.')
+        self.logger.info(msg=msg)
+        dstgrid_mask = dstgrid_mask_obj.values
+        dstgrid_mask = numpy.where(dstgrid_mask > 0.0, 1.0, 0.0)
+
+        # Interpolate the source grid mask to the destination grid
+        # projection.
+        msg = "Interpolating the source grid mask to the destination grid."
+        self.logger.info(msg=msg)
+        interp_mask = self.remap_app(invar=srcgrid_mask, interp_type="bilinear",
+                                     srcgrid_stagger="mass", dstgrid_stagger="mass",
+                                     srcgrid_obj=srcgrid_obj, dstgrid_obj=dstgrid_obj,
+                                     remap_obj=remap_obj)
+
+        interp_mask = numpy.where(interp_mask < 0.99, 0.0, 1.0)
+        (ni, nj, nlevs) = (len(interp_mask[0, :]), len(
+            interp_mask[:, 0]), nlevs)
+
+        # Build the landmask object.
+        landmask_obj = parser_interface.object_define()
+        landmask_list = ['dstgrid_mask', 'interp_mask'
+                         ]
+
+        for item in landmask_list:
+            landmask = numpy.zeros([nlevs, nj, ni])
+            kwargs = {'object_in': landmask_obj,
+                      'key': item, 'value': landmask}
+            landmask_obj = parser_interface.object_setattr(
+                object_in=landmask_obj, key=item, value=landmask)
+
+        landmask_obj.dstgrid_mask[:, ...] = dstgrid_mask[:, :]
+        landmask_obj.interp_mask[:, ...] = interp_mask[:, :]
+        (ni, nj, nlevs) = (len(interp_mask[0, :]), len(
+            interp_mask[:, 0]), nlevs)
+
+        # Define the destination grid landmask dimensions.
+        grid_dim_list = ['ni', 'nj', 'nlevs']
+
+        for grid_dim in grid_dim_list:
+            landmask_obj = parser_interface.object_setattr(
+                object_in=landmask_obj, key=grid_dim, value=eval(grid_dim))
+
+        return landmask_obj
+
+    def build_ncoutput(self, dstgrid_obj: object, varinfo_obj: object,
+                       nlevs: int, variable_list: List, output_netcdf: str,
+                       update_hcoord: bool = False, update_zcoord: bool = False) -> None:
+        """
+        Description
+        -----------
+
+        This method builds the external netCDF formatted file to
+        contain the interpolated input variables.
+
+        Parameters
+        ----------
+
+        dstgrid_obj: object
+
+            A Python object containing the destination grid attributes
+            collected from the experiment configuration.
+
+        varinfo_obj: object
+
+            A Python object containing the variable attributes for the
+            variables to be interpolated (regridded) from a source
+            grid projection to a destination grid projection.
+
+        nlevs: int
+
+            A Python integer value specifying the total number of
+            unstaggered vertical levels for the MOM6 destination grid.
+
+        variable_list: list
+
+            A Python list containing the list of user-specified
+            variables to be interpolated (from the experiment
+            configuration).
+
+        output_netcdf: str
+
+            A Python string specifying the path to the external netCDF
+            formatted file to contain the MOM6 initial conditions.
+
+        Keywords
+        --------
+
+        update_hcoord: bool, optional
+
+            A Python boolean-type variable specifying whether the
+            respective input model horizontal coordinates need to be
+            updated to comply with the expectations of MOM6.
+
+        update_zcoord: bool, optional
+
+            A Python boolean-type variable specifying whether the
+            respective input model vertical coordinate needs to be
+            updated to comply with the expectations of MOM6.
+
+        """
+
+        # Initialize the external netCDF-formatted file to contain the
+        # remapped variables.
+        msg = (f'Preparing output file {output_netcdf} for interpolated '
+               'MOM6 variables.'
+               )
+        self.logger.info(msg=msg)
+
+        ncfile = parser_interface.object_getattr(
+            object_in=dstgrid_obj, key="grid_ncfile", force=True)
+        if ncfile is None:
+            msg = ('The destination grid netCDF formatted file path '
+                   'could not be determined from the user experiment '
+                   'configuration. Aborting!!!')
+            raise RemapperError(msg=msg)
+
+        grid_obj = xarray_interface.open(ncfile=ncfile)
+        dims_obj = self.build_cfmetadata(grid_obj=grid_obj, dstgrid_obj=dstgrid_obj,
+                                         nlevs=nlevs)
+        grid_obj.close()
+
+        varobj_list = []
+        for variable in variable_list:
+            coords = {}
+            varinfo_dict = parser_interface.object_getattr(
+                object_in=varinfo_obj, key=variable, force=True)
+            if varinfo_dict is None:
+                msg = ('The user experiment configuration does not specify '
+                       f'the attributes for variable {variable} and/or could not be '
+                       'determined from the user experiment configuration. '
+                       'Aborting!!!'
+                       )
+                raise RemapperError(msg=msg)
+
+            # Define the mass-grid variable attributes; proceed
+            # accordingly.
+            if varinfo_dict['grid_stagger'].lower() == 'mass':
+
+                if update_hcoord:
+                    msg = f'Updating horizontal mass coordinates for variable {variable}.'
+                    self.logger.warn(msg=msg)
+                    (varinfo_dict['xdim_name'], varinfo_dict['ydim_name']) = \
+                        ['lonh', 'lath']
+
+                coords = {'lath': (['lath'], dims_obj.latm),
+                          'lonh': (['lonh'], dims_obj.lonm),
+                          'Time': (['Time'], dims_obj.time)
+                          }
+
+                (nx, ny) = (len(dims_obj.lonm), len(dims_obj.latm))
+
+            # Define the zonal-velocity grid variable attributes;
+            # proceed accordingly.
+            if varinfo_dict['grid_stagger'].lower() == 'uvel':
+
+                if update_hcoord:
+                    msg = ('Updating horizontal zonal-velocity coordinates for variable '
+                           f'{variable}.'
+                           )
+                    self.logger.warn(msg=msg)
+                    (varinfo_dict['xdim_name'], varinfo_dict['ydim_name']) = \
+                        ['lonq', 'lath']
+
+                coords = {'lath': (['lath'], dims_obj.latm),
+                          'lonq': (['lonq'], dims_obj.lonm),
+                          'Time': (['Time'], dims_obj.time)
+                          }
+
+                (nx, ny) = (len(dims_obj.lonu), len(dims_obj.latu))
+
+            # Define the meridional-velocity grid variable attributes;
+            # proceed accordingly.
+            if varinfo_dict['grid_stagger'].lower() == 'vvel':
+
+                if update_hcoord:
+                    msg = ('Updating horizontal meridional-velocity coordinates for variable '
+                           f'{variable}.'
+                           )
+                    self.logger.warn(msg=msg)
+                    (varinfo_dict['xdim_name'], varinfo_dict['ydim_name']) = \
+                        ['lonh', 'latq']
+
+                coords = {'latq': (['latq'], dims_obj.latm),
+                          'lonh': (['lonh'], dims_obj.lonm),
+                          'Time': (['Time'], dims_obj.time)
+                          }
+
+                (nx, ny) = (len(dims_obj.lonv), len(dims_obj.latv))
+
+            # Update the vertical coordinate attributes accordingly.
+            if update_zcoord:
+                zcoord = parser_interface.dict_key_value(
+                    dict_in=varinfo_dict, key="zdim_name", force=True, no_split=True)
+                if zcoord is None:
+                    msg = (f'The variable {variable} does not have a z-coordinate; '
+                           'skipping.')
+                    self.logger.warn(msg=msg)
+
+                if zcoord is not None:
+                    msg = (f'Updating z-coordinate for variable {variable} from {zcoord} to '
+                           'Layer.')
+                    self.logger.warn(msg=msg)
+                    varinfo_dict['zdim_name'] = 'Layer'
+
+            # STOPPED HERE
+
+            try:
+                coords.update({varinfo_dict['zdim_name']: ([varinfo_dict['zdim_name']],
+                                                           dims_obj.layers)})
+                dims = ['Time', varinfo_dict['zdim_name'], varinfo_dict['ydim_name'],
+                        varinfo_dict['xdim_name']]
+                msg = ('Building netCDF array for variable %s of (x,y,z) dimension '
+                       '(%s,%s,%s).' % (variable, nx, ny, nlevs))
+            except KeyError:
+                varinfo_dict['zdim_name'] = None
+                dims = ['Time', varinfo_dict['ydim_name'],
+                        varinfo_dict['xdim_name']]
+                msg = ('Build netCDF variable %s of (x,y) dimension (%s,%s).' %
+                       (variable, nx, ny))
+
+            self.logger.info(msg=msg)
+            if varinfo_dict['zdim_name'] is None:
+                varval = numpy.zeros([1, ny, nx])
+            if varinfo_dict['zdim_name'] is not None:
+                varval = numpy.zeros([1, nlevs, ny, nx])
+            kwargs = {'dict_in': varinfo_dict,
+                      'key': 'dst_ncvarname', 'no_split': True}
+            ncvarname = parser_interface.dict_key_value(**kwargs)
+            kwargs = {'varval': varval, 'coords': coords, 'dims': dims, 'ncvarname':
+                      ncvarname}
+            varobj = xarray_interface.varobj(**kwargs)
+            varobj_list.append(varobj)
+
+        kwargs = {'ncfile': output_netcdf, 'varobj_list': varobj_list,
+                  'unlimitdim': 'Time'}  # , 'variable_list': variable_list}
+        xarray_interface.dataset(**kwargs)
+        kwargs = {'ncfile': output_netcdf, 'ncvarname': 'lonq',
+                  'ncvar': dims_obj.lonu}
+        netcdf4_interface.ncwritevar(**kwargs)
+        kwargs = {'ncfile': output_netcdf, 'ncvarname': 'latq',
+                  'ncvar': dims_obj.latv}
+        netcdf4_interface.ncwritevar(**kwargs)
+
+    def build_varattrobjs(self: Ocean, varinfo_dict: Dict) -> Tuple[object, object]:
+        """
+        Description
+        -----------
+
+        This method collects the attributes for the MOM6 variables to
+        be interpolated (regridded) from the user experiment
+        configuration file.
+
+        Parameters
+        ----------
+
+        varinfo_dict: dict
+
+            A Python dictionary containing the user experiment
+            configuration MOM6 variable attributes.
+
+        Returns
+        -------
+
+        ncattr_obj: object
+
+            A Python object containing the netCDF file attributes
+            collected from the user experiment configuration.
+
+        varattr_obj: object
+
+            A Python object containing the MOM6 variable attributes
+            collected from the user experiment configuration.
+
+        """
+        (ncattr_obj, varattr_obj) = [parser_interface.object_define()
+                                     for i in range(2)]
+        ncattrs_list = ['ncfilename', 'src_ncvarname', 'dst_ncvarname']
+        for ncattr in ncattrs_list:
+            kwargs = {'dict_in': varinfo_dict, 'key': ncattr, 'force': True,
+                      'no_split': True}
+            value = parser_interface.dict_key_value(**kwargs)
+            if value is None:
+                msg = ('The netCDF attribute %s could not be determined from '
+                       'the user experiment configuration for variable %s. '
+                       'Aborting!!!' % (ncattr, variable))
+                raise RemapperError(msg=msg)
+            kwargs = {'object_in': ncattr_obj,
+                      'key': ncattr, 'value': value}
+            ncattr_obj = parser_interface.object_setattr(**kwargs)
+            kwargs = {'path': ncattr_obj.ncfilename}
+            exist = fileio_interface.fileexist(**kwargs)
+            if not exist:
+                msg = ('The netCDF file %s does not exist. Aborting!!!' %
+                       ncattr_obj.ncfilename)
+                raise RemapperError(msg=msg)
+        varattr_list = ['grid_stagger',
+                        'interp_type', 'xdim_name', 'ydim_name']
+        for varattr in varattr_list:
+            kwargs = {'dict_in': varinfo_dict, 'key': varattr, 'force': True,
+                      'no_split': True}
+            value = parser_interface.dict_key_value(**kwargs)
+            if value is None:
+                msg = ('The variable attribute %s could not be determined for '
+                       'variable %s from the user experiment configuration. '
+                       'Aborting!!!' % (varattr, variable))
+                raise RemapperError(msg=msg)
+            kwargs = {'object_in': varattr_obj,
+                      'key': varattr, 'value': value}
+            varattr_obj = parser_interface.object_setattr(**kwargs)
+            kwargs = {'dict_in': varinfo_dict, 'key': 'zdim_name', 'force': True,
+                      'no_split': True}
+            value = parser_interface.dict_key_value(**kwargs)
+            kwargs = {'object_in': varattr_obj,
+                      'key': 'zdim_name', 'value': value}
+            varattr_obj = parser_interface.object_setattr(**kwargs)
+        return (ncattr_obj, varattr_obj)
 
     def get_uvvars(self: Ocean) -> object:
         """
@@ -234,7 +784,8 @@ class MOM6(Ocean):
                 msg = f"Reading MOM6 momentum variable {dst_ncvarname}."
                 self.logger.info(msg=msg)
 
-                (ncattr_obj, _) = self.build_mom6_varattrobjs(varinfo_dict=varinfo_dict)
+                (ncattr_obj, _) = self.build_varattrobjs(
+                    varinfo_dict=varinfo_dict)
                 ncvar = netcdf4_interface.ncreadvar(
                     ncfile=ncattr_obj.ncfilename,
                     ncvarname=ncattr_obj.src_ncvarname,
@@ -397,7 +948,7 @@ class MOM6(Ocean):
                 msg = f"Preparing to regrid variable {variable}."
                 self.logger.info(msg=msg)
 
-                (ncattr_obj, varattr_obj) = self.build_mom6_varattrobjs(
+                (ncattr_obj, varattr_obj) = self.build_varattrobjs(
                     varinfo_dict=varinfo_dict
                 )
                 msg = (
@@ -506,7 +1057,8 @@ class MOM6(Ocean):
         # Rotate the velocity vector components to Earth relative
         # components.
         (ucurr, vcurr) = self.rotate_currents(
-            grid_obj=self.srcgrid_obj, ucurr=umass, vcurr=vmass, earth_rel=True
+            grid_obj=self.srcgrid_obj, ucurr=umass, vcurr=vmass, nlevs=self.nlevs,
+            earth_rel=True
         )
 
         # Interpolate the velocity vector components, defined at the
@@ -536,7 +1088,8 @@ class MOM6(Ocean):
         # Rotate the velocity vector components to grid relative
         # components.
         (ucurr, vcurr) = self.rotate_currents(
-            grid_obj=self.dstgrid_obj, ucurr=umass, vcurr=vmass, grid_rel=True
+            grid_obj=self.dstgrid_obj, ucurr=umass, vcurr=vmass, nlevs=self.nlevs,
+            grid_rel=True
         )
 
         # Interpolate the destination grid current velocity vector
@@ -613,7 +1166,8 @@ class MOM6(Ocean):
 
             # Define the respective velocity component values at the
             # respective staggered-grid locations.
-            ncvar = parser_interface.dict_key_value(dict_in=dst_vardict, key="ncvar")
+            ncvar = parser_interface.dict_key_value(
+                dict_in=dst_vardict, key="ncvar")
             invar = numpy.where(ncvar >= 1.0e10, 0.0, ncvar)
 
             # Remap the respective velocity component values from the
