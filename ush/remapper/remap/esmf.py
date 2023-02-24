@@ -162,7 +162,7 @@ class ESMF(Remap):
         # Collect the netCDF-formatted file and respective variable
         # array attributes; proceed accordingly.
         ncfile = parser_interface.object_getattr(
-            object_in=grid_obj, key="ncfile", force=True
+            object_in=grid_obj, key="grid_ncfile", force=True
         )
         if ncfile is None:
             msg = (
@@ -299,7 +299,6 @@ class ESMF(Remap):
         remap_ncfile = parser_interface.object_getattr(
             object_in=self.remap_obj, key=remap_type, force=True
         )
-
         if remap_ncfile is None:
             msg = (
                 f"The remap file {remap_ncfile} has not been defined "
