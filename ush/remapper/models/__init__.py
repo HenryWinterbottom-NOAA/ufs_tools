@@ -208,7 +208,7 @@ class Models:
             an existing netCDF file path containing the ESMF remapping
             attributes; if False, the ESMF remapping attributes will
             be written to a netCDF formatted file specified by the
-            user experiment configuration.
+            experiment configuration.
 
         src2src: bool, optional
 
@@ -257,7 +257,7 @@ class Models:
 
         This method defines the base-class attribute remap_app which
         defines the base-class module to be used to interpolate the
-        respective variables; the method is determined by the user
+        respective variables; the method is determined by the
         experiment configuration value for interp_scheme.
 
         Parameters
