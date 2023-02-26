@@ -173,8 +173,7 @@ class WrapperESMFRemap:
 
         # Define the attributes for the ESMF remapping application
         # script.
-        [self.exe, self.job_type] = [
-            system_interface.get_app_path(app="python"), "app"]
+        [self.exe, self.job_type] = [system_interface.get_app_path(app="python"), "app"]
 
     def __defenv__(self, yaml_key: str, yaml_dict: Dict) -> None:
         """
@@ -228,8 +227,7 @@ class WrapperESMFRemap:
                 )
                 raise ESMFRemapError(msg=msg)
 
-            parser_interface.enviro_set(
-                envvar=f"{item.upper()}", value=str(value))
+            parser_interface.enviro_set(envvar=f"{item.upper()}", value=str(value))
 
         # Update the run-time environment for the respective remapping
         # application.
@@ -339,8 +337,7 @@ class WrapperESMFRemap:
         msg = f"Launching remapping application {yaml_key}."
         self.logger.info(msg=msg)
 
-        args = [f"{self.options_obj.script_path}",
-                "--yaml_file", self.yaml_template]
+        args = [f"{self.options_obj.script_path}", "--yaml_file", self.yaml_template]
         errlog = f"{yaml_key}.err"
         outlog = f"{yaml_key}.out"
 
