@@ -339,8 +339,7 @@ class WrapperESMFRemap:
         msg = f"Launching remapping application {yaml_key}."
         self.logger.info(msg=msg)
 
-        args = [f"{self.options_obj.script_path}",
-                "--yaml_file", self.yaml_template]
+        args = [f"{self.options_obj.script_path}", "--yaml_file", self.yaml_template]
         errlog = f"{yaml_key}.err"
         outlog = f"{yaml_key}.out"
 

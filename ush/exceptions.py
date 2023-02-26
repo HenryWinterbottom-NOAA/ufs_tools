@@ -46,6 +46,11 @@ Classes
         This is the base-class for exceptions encountered within the
         ush/innov_stats/compute module; it is a sub-class of Error.
 
+    RemapperError()
+
+        This is the base-class for exceptions encountered within the
+        ush/remapper module; it is a sub-class of Error.
+
 Requirements
 ------------
 
@@ -70,7 +75,8 @@ from utils.error_interface import Error
 # ----
 
 # Define all available attributes.
-__all__ = ["ESMFRemapError", "GridSpecError", "InnovStatsComputeError"]
+__all__ = ["ESMFRemapError", "GridSpecError",
+           "InnovStatsComputeError", "RemapperError"]
 
 # ----
 
@@ -116,5 +122,18 @@ class InnovStatsComputeError(Error):
 
     This is the base-class for exceptions encountered within the
     ush/innov_stats/compute module; it is a sub-class of Error.
+
+    """
+
+# ----
+
+
+class RemapperError(Error):
+    """
+    Description
+    -----------
+
+    This is the base-class for exceptions encountered within the
+    ush/remapper module; it is a sub-class of Error.
 
     """
