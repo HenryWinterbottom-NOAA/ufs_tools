@@ -1,4 +1,4 @@
-# Configuring the EMSF Remaping Application
+# Configuring the EMSF Remapping Application
 
 This document describes the configuration options for the supported
 `esmf_remap` applications. The following is a snippet for a

@@ -1,6 +1,6 @@
 # =========================================================================
 
-# Module: ush/esmf_remap/__init__.py
+# Module: ush/remapper/remap/__init__.py
 
 # Author: Henry R. Winterbottom
 

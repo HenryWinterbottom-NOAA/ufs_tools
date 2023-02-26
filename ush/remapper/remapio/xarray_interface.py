@@ -29,33 +29,33 @@ Description
     This module contains interfaces to the Python xarray library; this
     interface requires xarray version 0.16.2 or earlier.
 
-Methods
--------
+Functions
+---------
 
     dataset(ncfile, varobj_list, unlimitdim = None)
 
-        This method defines a xarray dataset object and writes the
+        This function defines a xarray dataset object and writes the
         respective variable objects (within the input varobj_list) to
         the specified netCDF formatted file.
 
     open(ncfile)
 
-        This method opens a netCDF file and returns a Python object
+        This function opens a netCDF file and returns a Python object
         containing the contents of the respective netCDF file.
 
     read(ncfile, ncvarname)
 
-        This method parses a netCDF file and returns the attributes
+        This function parses a netCDF file and returns the attributes
         for the specified netCDF variable.
 
     varobj(varval, coords, dims, ncvarname)
 
-        This method defines an xarray DataArray object in accordance
+        This function defines an xarray DataArray object in accordance
         with the specified arguments.
 
     write(ncfile, var_obj, var_arr)
 
-        This method writes an array of values to an existing variable
+        This function writes an array of values to an existing variable
         within the specified netCDF file.
 
 Requirements
@@ -111,7 +111,7 @@ def dataset(ncfile: str, varobj_list: List, unlimitdim: str = None) -> None:
     Description
     -----------
 
-    This method defines a xarray dataset object and writes the
+    This function defines a xarray dataset object and writes the
     respective variable objects (within the input varobj_list) to the
     specified netCDF formatted file.
 
@@ -162,7 +162,7 @@ def open(ncfile: str) -> object:
     Description
     -----------
 
-    This method opens a netCDF file and returns a Python object
+    This function opens a netCDF file and returns a Python object
     containing the contents of the respective netCDF file.
 
     Parameters
@@ -204,7 +204,7 @@ def read(ncfile: str, ncvarname: str) -> object:
     Description
     -----------
 
-    This method parses a netCDF file and returns the attributes for
+    This function parses a netCDF file and returns the attributes for
     the specified netCDF variable.
 
     Parameters
@@ -264,8 +264,8 @@ def varobj(varval: numpy.array, coords: Dict, dims: List, ncvarname: str) -> obj
     Description
     -----------
 
-    This method defines an xarray DataArray object in accordance with
-    the specified arguments.
+    This function defines an xarray DataArray object in accordance
+    with the specified arguments.
 
     Parameters
     ----------
@@ -314,7 +314,7 @@ def write(ncfile: str, var_obj: object, var_arr: numpy.array) -> None:
     Description
     -----------
 
-    This method writes an array of values to an existing variable
+    This function writes an array of values to an existing variable
     within the specified netCDF file.
 
     Parameters

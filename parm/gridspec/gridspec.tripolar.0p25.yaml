@@ -1,12 +1,42 @@
 # Define the netCDF-formatted output file to contain the gridspec
 # reduced-grid attributes.
-output_netcdf: /run/gridspec.tripolar.0p25.nc
+output_netcdf: /work/gridspec/mom6_cice_grids.gridspec/0p25/gridspec.tripolar.0p25.nc
 
 # ----
 
 # Define the Arakawa-type grid; a complete list of Arakawa-type grids
 # can be found here: https://tinyurl.com/arakawa-type-grids
 grid_type: C
+
+# Specify whether the respective input grid projection is that of a
+# tripolar grid.
+is_tripolar: True
+
+# Specify whether to wrap the respective longitude array values; if
+# True, this will also shift the grid-projection angle by a factor of
+# pi.
+is_wrap_lons: True
+
+# ----
+
+# Define the grid-projection angle orientation information attributes.
+angle:
+
+     # Define the path to the netCDF-formatted file containing
+     # supergrid respective geographical coordinate values.
+     ncfile: /work/gridspec/mom6_cice_grids.gridspec/0p25/ocean_hgrid.nc
+
+     # Define the zonal-coordinate dimension name for the respective
+     # geographical coordinate variable.
+     ncxdim: nxp
+
+     # Define the meridional-coordinate dimension name for the
+     # respective geographical coordinate variable.
+     ncydim: nyp
+
+     # Define the netCDF-formatted file variable name for the
+     # respective geographical coordinate.
+     ncvarname: angle_dx
 
 # ----
 
@@ -15,15 +45,15 @@ latitude:
 
      # Define the path to the netCDF-formatted file containing
      # supergrid respective geographical coordinate values.
-     ncfile: /run/mom6_cice_grids/0p25/ocean_hgrid.nc
+     ncfile: /work/gridspec/mom6_cice_grids.gridspec/0p25/ocean_hgrid.nc
 
      # Define the zonal-coordinate dimension name for the respective
      # geographical coordinate variable.
-     ncxdim: nx
+     ncxdim: nxp
 
      # Define the meridional-coordinate dimension name for the
      # respective geographical coordinate variable.
-     ncydim: ny
+     ncydim: nyp
 
      # Define the netCDF-formatted file variable name for the
      # respective geographical coordinate.
@@ -36,15 +66,15 @@ longitude:
 
      # Define the path to the netCDF-formatted file containing
      # supergrid respective geographical coordinate values.
-     ncfile: /run/mom6_cice_grids/0p25/ocean_hgrid.nc
+     ncfile: /work/gridspec/mom6_cice_grids.gridspec/0p25/ocean_hgrid.nc
 
      # Define the zonal-coordinate dimension name for the respective
      # geographical coordinate variable.
-     ncxdim: nx
+     ncxdim: nxp
 
      # Define the meridional-coordinate dimension name for the
      # respective geographical coordinate variable.
-     ncydim: ny
+     ncydim: nyp
 
      # Define the netCDF-formatted file variable name for the
      # respective geographical coordinate.
