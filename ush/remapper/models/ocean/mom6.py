@@ -37,7 +37,7 @@ Classes
     MOM6(srcgrid_obj, dstgrid_obj, remap_obj, varinfo_obj)
 
         This is the base-class object for interpolating (regridding)
-        user specified variables from a source grid projection to the
+        specified variables from a source grid projection to the
         Modular Ocean Model Version 6 (MOM6) forecast model grid
         projection; it is a sub-class of Ocean.
 
@@ -86,10 +86,10 @@ class MOM6(Ocean):
     Description
     -----------
 
-    This is the base-class object for interpolating (regridding) user
+    This is the base-class object for interpolating (regridding)
     specified variables from a source grid projection to the Modular
     Ocean Model Version 6 (MOM6) forecast model grid projection; it is
-    a sub-class of Ocean
+    a sub-class of Ocean.
 
     Parameters
     ----------
@@ -97,17 +97,17 @@ class MOM6(Ocean):
     dstgrid_obj: object
 
         A Python object containing the destination grid attributes
-        collected from the user experiment configuration.
+        collected from the experiment configuration.
 
     srcgrid_obj: object
 
         A Python object containing the source grid attributes
-        collected from the user experiment configuration.
+        collected from the experiment configuration.
 
     remap_obj: object
 
         A Python object containing the interpolation (e.g.,
-        regridding) attributes collected from the user experiment
+        regridding) attributes collected from the experiment
         configuration.
 
     varinfo_obj: object
@@ -487,7 +487,8 @@ class MOM6(Ocean):
                 msg = f"Reading MOM6 momentum variable {dst_ncvarname}."
                 self.logger.info(msg=msg)
 
-                (ncattr_obj, _) = self.build_varattrobjs(varinfo_dict=varinfo_dict)
+                (ncattr_obj, _) = self.build_varattrobjs(
+                    varinfo_dict=varinfo_dict)
                 ncvar = netcdf4_interface.ncreadvar(
                     ncfile=ncattr_obj.ncfilename,
                     ncvarname=ncattr_obj.src_ncvarname,
@@ -873,7 +874,8 @@ class MOM6(Ocean):
 
             # Define the respective velocity component values at the
             # respective staggered-grid locations.
-            ncvar = parser_interface.dict_key_value(dict_in=dst_vardict, key="ncvar")
+            ncvar = parser_interface.dict_key_value(
+                dict_in=dst_vardict, key="ncvar")
             invar = numpy.where(ncvar >= 1.0e10, 0.0, ncvar)
 
             # Remap the respective velocity component values from the
@@ -902,7 +904,7 @@ class MOM6(Ocean):
 
         return (umass, vmass)
 
-    def run(self: Ocean):
+    def run(self: Ocean) -> None:
         """
         Description
         -----------
