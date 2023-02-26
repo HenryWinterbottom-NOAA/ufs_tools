@@ -123,7 +123,7 @@ class ComputeGridSpec:
     """
 
     def __init__(self, options_obj: object):
-        """ 
+        """
         Description
         -----------
 
