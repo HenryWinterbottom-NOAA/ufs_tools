@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 import os
 
+from remapper.models.ice.cice import CICE
 from remapper.models.ocean.mom6 import MOM6
 
 from confs.yaml_interface import YAML
@@ -58,7 +59,9 @@ class Remapper:
         self.coord_types_list = ['nclat', 'nclon']
 
         # Define the supported forecast model remapping applications.
-        self.models_dict = {"mom6": MOM6}
+        self.models_dict = {"cice": CICE,
+                            "mom6": MOM6
+                            }
 
         # Define the supported remapping types; these are the YAML
         # keys (and value pairs) corresponding to the types of

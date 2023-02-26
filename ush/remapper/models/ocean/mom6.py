@@ -165,7 +165,8 @@ class MOM6(Ocean):
         # Initialize all regridding/remapping objects.
         self.maskupdate = maskupdate.MaskUpdate()
 
-        self.remap_app = self.get_interpscheme(interp_scheme=self.interp_scheme)
+        self.remap_app = self.get_interpscheme(
+            interp_scheme=self.interp_scheme)
 
         self.bathy_obj = self.build_bathy(varinfo_obj=self.varinfo_obj)
 
@@ -259,7 +260,8 @@ class MOM6(Ocean):
 
         msg = f"Collecting the source grid mask from netCDF-formatted file {ncfile}."
         self.logger.info(msg=msg)
-        srcgrid_mask_obj = xarray_interface.read(ncfile=ncfile, ncvarname="wet")
+        srcgrid_mask_obj = xarray_interface.read(
+            ncfile=ncfile, ncvarname="wet")
 
         ncfile = parser_interface.object_getattr(
             object_in=dstgrid_obj, key="topo_ncfile", force=True
@@ -275,7 +277,8 @@ class MOM6(Ocean):
             f"Collecting the destination grid mask from netCDF-formatted file {ncfile}."
         )
         self.logger.info(msg=msg)
-        dstgrid_mask_obj = xarray_interface.read(ncfile=ncfile, ncvarname="wet")
+        dstgrid_mask_obj = xarray_interface.read(
+            ncfile=ncfile, ncvarname="wet")
 
         # Update the respective source and destination grid masks
         # accordingly.
@@ -360,11 +363,26 @@ class MOM6(Ocean):
             A Python object containing the MOM6 variable attributes
             collected from the experiment configuration.
 
+        Raises
+        ------
+
+        RemapperError:
+
+            * raised if a netCDF attribute cannot be determined from
+              the experiment configuration.
+
+            * raised if a specified netCDF-formatted file path does
+              not exist.
+
+            * raised if a variable attribute cannot be determined from
+              the experiment configuration.
+
         """
 
         # Define the Python objects containing the netCDF-formatted
         # file and MOM6 variable attributes; proceed accordingly.
-        (ncattr_obj, varattr_obj) = [parser_interface.object_define() for i in range(2)]
+        (ncattr_obj, varattr_obj) = [
+            parser_interface.object_define() for i in range(2)]
 
         # Build the netCDF-formatted file attributes.
         ncattrs_list = ["ncfilename", "src_ncvarname", "dst_ncvarname"]
@@ -389,7 +407,8 @@ class MOM6(Ocean):
                 raise RemapperError(msg=msg)
 
         # Build the MOM6 variable attributes.
-        varattr_list = ["grid_stagger", "interp_type", "xdim_name", "ydim_name"]
+        varattr_list = ["grid_stagger",
+                        "interp_type", "xdim_name", "ydim_name"]
 
         for varattr in varattr_list:
             value = parser_interface.dict_key_value(

@@ -100,7 +100,8 @@ class Ocean(Models):
         # Define the base-class attributes.
         super().__init__()
 
-        self.bathy_adjust_default_dict = {"angstrom_z": 1.0e-10, "htolerance": 1.0e-10}
+        self.bathy_adjust_default_dict = {
+            "angstrom_z": 1.0e-10, "htolerance": 1.0e-10}
 
     def bathy_adjust(
         self: Models, bathy_obj: object, landmask_obj: object, output_netcdf: str
@@ -148,7 +149,8 @@ class Ocean(Models):
         sfc = numpy.where(landmask_obj.dstgrid_mask[0, :, :] > 0, sfc, 0.0)
         var_obj = self.build_varobj(ncvarname="sfc")
 
-        xarray_interface.write(ncfile=output_netcdf, var_obj=var_obj, var_arr=sfc)
+        xarray_interface.write(ncfile=output_netcdf,
+                               var_obj=var_obj, var_arr=sfc)
 
         # Adjust the interpolated variable thickness profile with
         # respect to the destination grid bathymetry.
@@ -161,7 +163,8 @@ class Ocean(Models):
         thck = netcdf4_interface.ncreadvar(
             ncfile=output_netcdf, ncvarname="h", squeeze=True, axis=0
         )
-        eta = numpy.zeros([(landmask_obj.nlevs + 1), landmask_obj.nj, landmask_obj.ni])
+        eta = numpy.zeros(
+            [(landmask_obj.nlevs + 1), landmask_obj.nj, landmask_obj.ni])
         eta[0, :, :] = sfc[:, :]
 
         # The following code block is adopted from the MOM6
@@ -180,7 +183,8 @@ class Ocean(Models):
 
         for level in range((landmask_obj.nlevs - 1), 0, -1):
             thck[level, :, :] = numpy.where(
-                eta[level, :, :] < (eta[(level + 1), :, :] + bathy_obj.angstrom_z),
+                eta[level, :, :] < (
+                    eta[(level + 1), :, :] + bathy_obj.angstrom_z),
                 bathy_obj.angstrom_z,
                 (eta[level, :, :] - eta[(level + 1), :, :]),
             )
@@ -196,7 +200,8 @@ class Ocean(Models):
                         ) / (float(landmask_obj.nlevs))
                     else:
                         dilate = (eta[0, yidx, xidx] + bathy_obj.depth[yidx, xidx]) / (
-                            eta[0, yidx, xidx] - eta[landmask_obj.nlevs, yidx, xidx]
+                            eta[0, yidx, xidx] -
+                            eta[landmask_obj.nlevs, yidx, xidx]
                         )
                         thck[:, yidx, xidx] = thck[:, yidx, xidx] * dilate
 
@@ -210,7 +215,8 @@ class Ocean(Models):
         self.logger.info(msg=msg)
         var_obj = self.build_varobj(ncvarname="h")
 
-        xarray_interface.write(ncfile=output_netcdf, var_obj=var_obj, var_arr=thck)
+        xarray_interface.write(ncfile=output_netcdf,
+                               var_obj=var_obj, var_arr=thck)
 
     def bathy_edits(
         self: Models, varinfo_obj: object, depth: numpy.array
@@ -661,7 +667,6 @@ class Ocean(Models):
 
         varobj_list = []
         for variable in variable_list:
-            coords = {}
             varinfo_dict = parser_interface.object_getattr(
                 object_in=varinfo_obj, key=variable, force=True
             )
@@ -786,7 +791,8 @@ class Ocean(Models):
 
             except KeyError:
                 varinfo_dict["zdim_name"] = None
-                dims = ["Time", varinfo_dict["ydim_name"], varinfo_dict["xdim_name"]]
+                dims = ["Time", varinfo_dict["ydim_name"],
+                        varinfo_dict["xdim_name"]]
                 msg = "Build netCDF variable {variable} of (x,y) dimension ({nx},{ny})."
                 varval = numpy.zeros([1, ny, nx])
 
