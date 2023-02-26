@@ -28,7 +28,7 @@ Description
 
     This module contains classes and methods to interpolate/regrid an
     external analysis variable(s) to a MOM6 (destination) grid
-    projection using the user experiment configuration specified
+    projection using the experiment configuration specified
     interpolation scheme.
 
 Classes
@@ -156,9 +156,9 @@ class MOM6(Ocean):
         if self.variable_list is None:
             msg = (
                 "The formatted list containing the list of variables "
-                "within the user experiment configuration which to "
+                "within the experiment configuration which to "
                 "be interpolated (regridded) could not be determined "
-                "from the user experiment configuration. Aborting!!!"
+                "from the experiment configuration. Aborting!!!"
             )
             raise RemapperError(msg=msg)
 

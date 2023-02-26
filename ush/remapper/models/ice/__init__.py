@@ -51,16 +51,18 @@ History
 
 # ----
 
+# pylint: disable=invalid-name
+# pylint: disable=too-many-arguments
+# pylint: disable=too-many-locals
 
 # ----
 
-import numpy
 from typing import List
 
+import numpy
 from exceptions import RemapperError
 from remapper.models import Models
 from remapper.remapio import xarray_interface
-
 from tools import parser_interface
 
 # ----
@@ -82,20 +84,21 @@ class Ice(Models):
 
     """
 
-    def __init__(self: Models):
-        """
-        Description
-        -----------
+#    def __init__(self: Models):
+#        """
+#        Description
+#        -----------
 
-        Creates a new Ice object.
+#        Creates a new Ice object.
 
-        """
+#        """
 
-        # Define the base-class attributes.
-        super().__init__()
+#        # Define the base-class attributes.
+#        super().__init__()
 
-    def build_cfmetadata(self: Models, grid_obj: object, dstgrid_obj: object,
-                         nlevs: int) -> object:
+    def build_cfmetadata(
+        self: Models, grid_obj: object, dstgrid_obj: object, nlevs: int
+    ) -> object:
         """
         Description
         -----------
@@ -150,9 +153,11 @@ class Ice(Models):
         )
 
         if mass_grid_dict is None:
-            msg = ('The destination mass grid geographical location '
-                   'attributes could not be determined from the user '
-                   'experiment configuration. Aborting!!!')
+            msg = (
+                "The destination mass grid geographical location "
+                "attributes could not be determined from the "
+                "experiment configuration. Aborting!!!"
+            )
             raise RemapperError(msg=msg)
 
         # Define the mass grid type attributes; proceed accordingly.
@@ -201,11 +206,14 @@ class Ice(Models):
 
         return dims_obj
 
-    def build_ncoutput(self: Models,
-                       dstgrid_obj: object,
-                       varinfo_obj: object,
-                       nlevs: int, variable_list: List,
-                       output_netcdf: str) -> None:
+    def build_ncoutput(
+        self: Models,
+        dstgrid_obj: object,
+        varinfo_obj: object,
+        nlevs: int,
+        variable_list: List,
+        output_netcdf: str,
+    ) -> None:
         """
         Description
         -----------
@@ -219,7 +227,7 @@ class Ice(Models):
         dstgrid_obj: object
 
             A Python object containing the destination grid attributes
-            collected from the user experiment configuration.
+            collected from the experiment configuration.
 
         landmask_obj: object
 
@@ -240,9 +248,8 @@ class Ice(Models):
 
         variable_list: list
 
-            A Python list containing the list of user-specified
-            variables to be interpolated (from the user experiment
-            configuration).
+            A Python list containing the list of specified variables
+            to be interpolated (from the experiment configuration).
 
         output_netcdf: str
 
@@ -253,11 +260,12 @@ class Ice(Models):
 
         # Initialize the external netCDF-formatted file to contain the
         # remapped variables.
-        msg = f'Preparing output file {output_netcdf} for interpolated CICE variables.'
+        msg = f"Preparing output file {output_netcdf} for interpolated CICE variables."
         self.logger.info(msg=msg)
 
         ncfile = parser_interface.object_getattr(
-            object_in=dstgrid_obj, key="grid_ncfile", force=True)
+            object_in=dstgrid_obj, key="grid_ncfile", force=True
+        )
         if ncfile is None:
             msg = (
                 "The destination grid netCDF formatted file path "
@@ -289,31 +297,41 @@ class Ice(Models):
             # accordingly.
             if varinfo_dict["grid_stagger"].lower() == "mass":
 
-                coords = {'nj': (['nj'], dims_obj.latm),
-                          'ni': (['ni'], dims_obj.lonm),
-                          'Time': (['Time'], dims_obj.time)}
+                coords = {
+                    "nj": (["nj"], dims_obj.latm),
+                    "ni": (["ni"], dims_obj.lonm),
+                    "Time": (["Time"], dims_obj.time),
+                }
 
                 (nx, ny) = (len(dims_obj.lonm), len(dims_obj.latm))
 
                 # Build the respective variable array; proceed
                 # accordingly.
                 try:
-                    coords.update({varinfo_dict['zdim_name']:
-                                   (varinfo_dict['zdim_name'], dims_obj.ncat)})
-                    ncat = dims_obj.ncat
-                    dims = ['Time', 'ncat', 'nj', 'ni']
+                    coords.update(
+                        {
+                            varinfo_dict["zdim_name"]: (
+                                varinfo_dict["zdim_name"],
+                                dims_obj.ncat,
+                            )
+                        }
+                    )
+                    dims = ["Time", "ncat", "nj", "ni"]
 
-                    msg = (f'Build netCDF variable {variable} of (x,y,z) dimension '
-                           f'({nx}, {ny}, {nlevs}).'
-                           )
+                    msg = (
+                        f"Build netCDF variable {variable} of (x,y,z) dimension "
+                        f"({nx}, {ny}, {nlevs})."
+                    )
                     varval = numpy.zeros([1, nlevs, ny, nx])
 
                 except KeyError:
-                    varinfo_dict['zdim_name'] = None
-                    dims = ['Time', 'nj', 'ni']
+                    varinfo_dict["zdim_name"] = None
+                    dims = ["Time", "nj", "ni"]
 
-                    msg = (f'Build netCDF variable {variable} of (x,y) dimension '
-                           f'({nx}, {ny}).')
+                    msg = (
+                        f"Build netCDF variable {variable} of (x,y) dimension "
+                        f"({nx}, {ny})."
+                    )
                     varval = numpy.zeros([1, ny, nx])
 
                 self.logger.info(msg=msg)
