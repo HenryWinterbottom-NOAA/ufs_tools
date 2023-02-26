@@ -18,11 +18,47 @@
 # =========================================================================
 
 """
+Module
+------
+
+    cice.py
+
+Description
+-----------
+
+    This module contains classes and methods to interpolate/regrid an
+    external analysis variable(s) to a CICE (destination) grid
+    projection using the user experiment configuration specified
+    interpolation scheme.
+
+Classes
+-------
+
+    CICE(srcgrid_obj, dstgrid_obj, remap_obj, varinfo_obj)
+
+        This is the base-class object for interpolating (regridding)
+        specified variables from a source grid projection to the CICE
+        Consortium Model for Sea-Ice Development forecast model (CICE)
+        grid projection; it is a sub-class of Ice.
+
+Author(s)
+---------
+
+    Henry R. Winterbottom; 26 February 2023
+
+History
+-------
+
+    2023-02-26: Henry Winterbottom -- Initial implementation.
 
 """
 
 # ----
 
+# pylint: disable=eval-used
+# pylint: disable=invalid-name
+# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-locals
 
 # ----
 
@@ -30,11 +66,10 @@ from typing import Dict, Tuple
 
 import numpy
 from exceptions import RemapperError
-
+from ioapps import netcdf4_interface
 from remapper.models.ice import Ice
 from remapper.remap import maskupdate
 from remapper.remapio import xarray_interface
-from ioapps import netcdf4_interface
 from tools import fileio_interface, parser_interface
 
 # ----
@@ -48,6 +83,38 @@ __email__ = "henry.winterbottom@noaa.gov"
 
 class CICE(Ice):
     """
+    Description
+    -----------
+
+    This is the base-class object for interpolating (regridding)
+    specified variables from a source grid projection to the CICE
+    Consortium Model for Sea-Ice Development forecast model (CICE)
+    grid projection; it is a sub-class of Ice.
+
+    Parameters
+    ----------
+
+    dstgrid_obj: object
+
+        A Python object containing the destination grid attributes
+        collected from the experiment configuration.
+
+    srcgrid_obj: object
+
+        A Python object containing the source grid attributes
+        collected from the experiment configuration.
+
+    remap_obj: object
+
+        A Python object containing the interpolation (e.g.,
+        regridding) attributes collected from the experiment
+        configuration.
+
+    varinfo_obj: object
+
+        A Python object containing the variable attributes for the
+        variables to be interpolated (regridded) from a source grid
+        projection to a destination grid projection.
 
     """
 
@@ -116,8 +183,13 @@ class CICE(Ice):
             output_netcdf=self.output_netcdf,
         )
 
-    def build_landmask(self: Ice, srcgrid_obj: object, dstgrid_obj: object,
-                       remap_obj: object, nlevs: int) -> object:
+    def build_landmask(
+        self: Ice,
+        srcgrid_obj: object,
+        dstgrid_obj: object,
+        remap_obj: object,
+        nlevs: int,
+    ) -> object:
         """
         Description
         -----------
@@ -167,7 +239,8 @@ class CICE(Ice):
 
         # Define the source and destination grid masks.
         ncfile = parser_interface.object_getattr(
-            object_in=srcgrid_obj, key="topo_ncfile", force=True)
+            object_in=srcgrid_obj, key="topo_ncfile", force=True
+        )
         if ncfile is None:
             msg = (
                 "The source grid topography file (topo_ncfile) could not be "
@@ -176,7 +249,7 @@ class CICE(Ice):
             raise RemapperError(msg=msg)
 
         # Build the CICE land/sea mask.
-        msg = ('Interpolating the CICE land/sea mask.')
+        msg = "Interpolating the CICE land/sea mask."
         self.logger.info(msg=msg)
 
         msg = f"Collecting the source grid mask from netCDF-formatted file {ncfile}."
@@ -198,8 +271,7 @@ class CICE(Ice):
             f"Collecting the destination grid mask from netCDF-formatted file {ncfile}."
         )
         self.logger.info(msg=msg)
-        dstgrid_mask_obj = xarray_interface.read(
-            ncfile=ncfile, ncvarname="wet")
+        dstgrid_mask_obj = xarray_interface.read(ncfile=ncfile, ncvarname="wet")
 
         # Update the respective source and destination grid masks
         # accordingly.
@@ -302,8 +374,7 @@ class CICE(Ice):
 
         # Define the Python objects containing the netCDF-formatted
         # file and CICE variable attributes; proceed accordingly.
-        (ncattr_obj, varattr_obj) = [
-            parser_interface.object_define() for i in range(2)]
+        (ncattr_obj, varattr_obj) = [parser_interface.object_define() for i in range(2)]
 
         # Build the netCDF-formatted file attributes.
         ncattrs_list = ["ncfilename", "src_ncvarname", "dst_ncvarname"]
@@ -328,8 +399,7 @@ class CICE(Ice):
                 raise RemapperError(msg=msg)
 
         # Build the CICE variable attributes.
-        varattr_list = ["grid_stagger",
-                        "interp_type", "xdim_name", "ydim_name"]
+        varattr_list = ["grid_stagger", "interp_type", "xdim_name", "ydim_name"]
 
         for varattr in varattr_list:
             value = parser_interface.dict_key_value(
@@ -419,11 +489,11 @@ class CICE(Ice):
                 # Read the variable from the netCDF-formatted input
                 # file.
                 ncvar = netcdf4_interface.ncreadvar(
-                    ncfile=ncattr_obj.ncfilename,
-                    ncvarname=ncattr_obj.src_ncvarname
+                    ncfile=ncattr_obj.ncfilename, ncvarname=ncattr_obj.src_ncvarname
                 )
 
-                invar = numpy.where(ncvar >= 1.0e10, 0.0, ncvar)
+                # invar = numpy.where(ncvar >= 1.0e10, 0.0, ncvar)
+                invar = numpy.where(ncvar == 0.0, numpy.nan, ncvar)
 
                 # Remap the source variable to the destination grid
                 # projection.
@@ -464,9 +534,28 @@ class CICE(Ice):
                     ncfile=self.output_netcdf, var_obj=var_obj, var_arr=outvar
                 )
 
-    def run(self: Ice):
+    def run(self: Ice) -> None:
         """
+        Description
+        -----------
+
+        This method performs the following tasks:
+
+        (1) Establishes the interpolation scheme to be applied (from
+            the experiment configuration) and defines the base-class
+            object to be used to interpolate the variables specified
+            in the experiment configuration.
+
+        (2) Defines the base-class objects containing the experiment
+            configuration attributes.
+
+        (3) Builds the output netCDF formatted file to contain the
+            interpolated variables.
+
+        (4) Interpolates (regrids) the specified variables to the
+            specified destination grid projection.
 
         """
 
+        # Remap the mass variables accordingly.
         self.regrid_massvars()
