@@ -1,0 +1,14 @@
+#!/bin/bash --posix
+
+# ----
+
+# user@host:$ brew install doxygen
+# user@host:$ pip install sphinxcontrib-bibtex
+
+# ----
+
+doxygen=$(which doxygen)
+
+$doxygen
+status=$?
+exit $status
