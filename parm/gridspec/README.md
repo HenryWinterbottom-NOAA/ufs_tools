@@ -13,6 +13,12 @@ grid_type: C
 is_tripolar: True
 is_wrap_lons: True
 
+angle:
+     ncfile: /run/mom6_cice_grids/0p25/ocean_hgrid.nc
+     ncvarname: angle_dx
+     ncxdim: nxp
+     ncydim: nyp
+
 latitude:
      ncfile: /run/mom6_cice_grids/0p25/ocean_hgrid.nc
      ncvarname: y
@@ -42,7 +48,7 @@ The following table describes each of the respective variables above.
 
 </div>
 
-The `latitude` and `longitude` YAML keys within the example
+The `angle`, `latitude`, and `longitude` YAML keys within the example
 configuration define the attributes for the respective geographical
 coordinates. Seperate YAML blocks are implemented to support instances
 when the respective geographical coordinate values are collected from
