@@ -37,6 +37,20 @@ user@host:$ git clone https://github.com/HenryWinterbottom-NOAA/ufs_tools
 A description of the respective applications may be found
 [here](./APPLICATIONS.md).
 
+# Building the Documentation
+
+The documentation, using the
+[Sphinx](https://docs.readthedocs.io/en/stable/intro/getting-started-with-sphinx.html)
+documentation generator, can be compiled as follows.
+
+~~~
+user@host:$ cd docs
+user@host:$ make html
+~~~
+
+The documentation will then be available within the `docs/build/html`
+path.
+
 # Forking
 
 If a user wishes to contribute modifications done within their
