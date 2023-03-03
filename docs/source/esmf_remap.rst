@@ -12,8 +12,9 @@ provides a script-level interface around the `xESMF
 Application Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``esmf_remap`` application for a remapping of :math:`0.25^{\circ}`
-grid-cell centers :math:`5.0^{\circ}` grid cell centers is as follows.
+The ``esmf_remap`` application configuration for a remapping of
+:math:`0.25^{\circ}` grid-cell centers :math:`5.0^{\circ}` grid cell
+centers is as follows.
 
 ::
 
@@ -24,7 +25,7 @@ grid-cell centers :math:`5.0^{\circ}` grid cell centers is as follows.
                is_grib: False
 	       is_netcdf: True
                gribfile: Null
-               ncfile: /run/gridspec.tripolar.0p25.nc
+               ncfile: /path/to/gridspec/gridspec.tripolar.0p25.nc
 	       nclat: tlat
                nclon: tlon
                ncxdim_name: nx
@@ -34,13 +35,13 @@ grid-cell centers :math:`5.0^{\circ}` grid cell centers is as follows.
                is_grib: False
 	       is_netcdf: True
                gribfile: Null
-               ncfile: /run/gridspec.tripolar.5p0.nc
+               ncfile: /path/to/gridspec/gridspec.tripolar.5p0.nc
 	       nclat: tlat
                nclon: tlon
                ncxdim_name: nx
                ncydim_name: ny
 
-      output_netCDF: /run/tripolar.0p25_5p0.bilinear.t2t_remap.nc
+      output_netCDF: /path/to/esmf_remap/output/tripolar.0p25_5p0.bilinear.t2t_remap.nc
 
 
 +------------------------------+---------------------------------------------------------------------------+
@@ -97,7 +98,7 @@ follows.
 ::
 
    user@host:$ cd scripts
-   user@host:$ python compute_esmf_remap.py --yaml_file ../parm/esmf_remap.yaml
+   user@host:$ python compute_esmf_remap.py --yaml_file ../parm/esmf_remap/esmf_remap.yaml
 
 If successful, a netCDF-formatted file containing the ESMF remapping
 attributes will be created containing the following metadata
@@ -105,7 +106,7 @@ attributes.
 
 ::
 
-   user@host:$ ncdump -h /run/tripolar.0p25_5p0.bilinear.t2t_remap.nc
+   user@host:$ ncdump -h /path/to/esmf_remap/output/tripolar.0p25_5p0.bilinear.t2t_remap.nc
 
    netcdf tripolar.0p25_5p0.bilinear.t2t_remap {
    dimensions:

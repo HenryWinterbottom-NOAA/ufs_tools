@@ -254,8 +254,15 @@ class CICE(Ice):
 
         msg = f"Collecting the source grid mask from netCDF-formatted file {ncfile}."
         self.logger.info(msg=msg)
-        srcgrid_mask_obj = xarray_interface.read(
-            ncfile=ncfile, ncvarname="wet")
+        try:
+            srcgrid_mask_obj = xarray_interface.read(
+                ncfile=ncfile, ncvarname="wet")
+        except RemapperError:
+            try:
+                srcgrid_mask_obj = xarray_interface.read(
+                    ncfile=ncfile, ncvarname="mask")
+            except RemapperError:
+                pass
 
         ncfile = parser_interface.object_getattr(
             object_in=dstgrid_obj, key="topo_ncfile", force=True
@@ -271,8 +278,15 @@ class CICE(Ice):
             f"Collecting the destination grid mask from netCDF-formatted file {ncfile}."
         )
         self.logger.info(msg=msg)
-        dstgrid_mask_obj = xarray_interface.read(
-            ncfile=ncfile, ncvarname="wet")
+        try:
+            dstgrid_mask_obj = xarray_interface.read(
+                ncfile=ncfile, ncvarname="wet")
+        except RemapperError:
+            try:
+                dstgrid_mask_obj = xarray_interface.read(
+                    ncfile=ncfile, ncvarname="mask")
+            except RemapperError:
+                pass
 
         # Update the respective source and destination grid masks
         # accordingly.
