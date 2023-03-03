@@ -1,0 +1,1500 @@
+# $$$ YAML DOCUMENTATION BLOCK
+  
+# UFS-RNR-containers :: parm/apps/cice_remapper.yaml
+
+# AUTHOR: Henry R. Winterbottom
+
+# EMAIL: henry.winterbottom@noaa.gov
+
+# DESCRIPTION:
+
+# This YAML formatted file contains the user attributes required to
+# remap a CICE initial condition and/or restart formatted file from
+# one (nominal) resolution to another.
+
+#----
+
+# Define the output netCDF file to contained the remapped variable
+# fields/grids.
+output_netCDF: /work/remapper/CICE.ic.5p0.nc
+
+# Specify the supported forecast model for which the remapping is to
+# performed; supported forecast models are as follows:
+
+# CICE: The Community Ice Code (e.g., the Los Alamos Ice Model);
+
+# GLORYS: Global Ocean Reanalysis and Simulation;
+
+# MOM6: The Modular Ocean Model.
+
+# ORAS5: Ocean Reanalysis System 5.
+forecast_model: cice
+
+# Define the interpolation scheme; currently available options are:
+
+# esmf: Earth System Modeling Framework; this requires seperate files
+#       for the bilinear and nearest neighbor interpolation
+#       remappings.
+
+# slint: Spherical Linear Interpolation; this requires a single file
+#        for the bilinear and nearest neighbor interpolation
+#        remappings.
+interp_scheme: esmf
+
+# Define the total number of vertical levels to be remapped; the input
+# and the output variable levels should be identical.
+nlevs: 5
+
+#----
+
+# Configuration options for all input and output grids.
+grids:
+
+     # Define the source grid attributes.
+     source:     
+     
+          # Define the source grid netCDF formatted file name.
+          grid_ncfile: /work/gridspec/mom6_cice_grids.gridspec/0p25/gridspec.tripolar.0p25.nc
+          topo_ncfile: /work/gridspec/mom6_cice_grids.gridspec/0p25/ocean_topog.nc
+
+          # Define the Arakawa grid type; see
+          # https://en.wikipedia.org/wiki/Arakawa_grids.
+          arakawa: C
+
+          # Define the Arakawa mass-coordinate geographical grid
+          # attributes.
+          mass:
+
+               # Define the netCDF variable name for the latitude
+               # coordinate variable.
+               nclat: tlat
+
+               # Define the netCDF variable name for the longitude
+               # coordinate variable.
+               nclon: tlon
+
+          # Define the Arakawa u-velocity coordinate geographical grid
+          # attributes.
+          uvel:
+
+               # Define the netCDF variable name for the latitude
+               # coordinate variable.
+               nclat: ulat
+
+               # Define the netCDF variable name for the longitude
+               # coordinate variable.
+               nclon: ulon
+
+          # Define the Arakawa v-velocity coordinate geographical grid
+          # attributes.
+          vvel:
+
+               # Define the netCDF variable name for the latitude
+               # coordinate variable.
+               nclat: vlat
+
+               # Define the netCDF variable name for the longitude
+               # coordinate variable.
+               nclon: vlon
+          
+
+     # Define the destination grid attributes.
+     destination:
+          
+          # Define the destination grid netCDF formatted file name.
+          grid_ncfile: /work/gridspec/mom6_cice_grids.gridspec/5p0/gridspec.tripolar.5p0.nc
+          topo_ncfile: /work/gridspec/mom6_cice_grids.gridspec/5p0/ocean_mask.nc
+
+          # Define the Arakawa grid type; see
+          # https://en.wikipedia.org/wiki/Arakawa_grids.
+          arakawa: C          
+          
+          # Define the Arakawa mass-coordinate geographical grid
+          # attributes.
+          mass:
+
+               # Define the netCDF variable name for the latitude
+               # coordinate variable.
+               nclat: tlat
+
+               # Define the netCDF variable name for the longitude
+               # coordinate variable.
+               nclon: tlon
+
+          # Define the Arakawa u-velocity coordinate geographical grid
+          # attributes.
+          uvel:
+
+               # Define the netCDF variable name for the latitude
+               # coordinate variable.
+               nclat: ulat
+
+               # Define the netCDF variable name for the longitude
+               # coordinate variable.
+               nclon: ulon
+
+          # Define the Arakawa v-velocity coordinate geographical grid
+          # attributes.
+          vvel:
+
+               # Define the netCDF variable name for the latitude
+               # coordinate variable.
+               nclat: vlat
+
+               # Define the netCDF variable name for the longitude
+               # coordinate variable.
+               nclon: vlon
+
+#----
+
+# Configuration options for all files containing remapping
+# coefficients and/or weightings.
+remap:
+
+     # Source mass grid to destination mass grid bilinear remapping
+     # attributes.
+     srcmass2dstmass_bilinear: /work/esmf_remap/tripolar.0p25_5p0.bilinear.t2t_remap.nc
+
+     # Source mass grid to destination mass grid nearest-neighbor
+     # remapping attributes.
+     srcmass2dstmass_nrstnghbr: /work/esmf_remap/tripolar.0p25_5p0.nearest_s2d.t2t_remap.nc
+
+#----
+
+# The following section describes the variables to be interpolated;
+# the user must specify the netCDF attributes as well as the Arakawa-C
+# grid attributes for the respective variables; the Arakawa-C grid
+# attributes (e.g., grid_stagger) options as follows:
+
+# mass; Arakawa grid mass variable locations;
+
+# uvel: Arakawa grid u-velocity variable locations;
+
+# vvel: Arakawa grid v-velocity variable locations;
+
+# There are also two-types of interpolation supported via either ESMF
+# or SLINT; the options are as follows:
+
+# bilinear; bi-linear interpolation
+
+# nrstnghbr; nearest-neighbor interpolation
+
+# Attributes for CICE variables to be remapped (e.g., interpolated).
+variables:
+
+     # Ice fraction.
+     ice_fraction:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: aicen
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: aicen          
+          
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+          # Define the z-dimension coordinate name.
+          zdim_name: ncat
+          
+     # Ice thickness.
+     ice_thickness:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: vicen
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: vicen  
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+          # Define the z-dimension coordinate name.
+          zdim_name: ncat
+
+     # Snow depth.
+     snow_depth:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: vsnon
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: vsnon
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+          # Define the z-dimension coordinate name.
+          zdim_name: ncat
+          
+     # Surface temperature.
+     surface_temperature:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: Tsfcn
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: Tsfcn
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+          # Define the z-dimension coordinate name.
+          zdim_name: ncat
+
+     # Sea-ice variable.
+     seaice_001:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: sice001
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: sice001
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+          # Define the z-dimension coordinate name.
+          zdim_name: ncat
+
+     # Sea-ice variable.
+     seaice_002:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: sice002
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: sice002
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+          # Define the z-dimension coordinate name.
+          zdim_name: ncat
+
+     # Sea-ice variable.
+     seaice_003:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: sice003
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: sice003
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+          # Define the z-dimension coordinate name.
+          zdim_name: ncat
+
+     # Sea-ice variable.
+     seaice_004:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: sice004
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: sice004
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+          # Define the z-dimension coordinate name.
+          zdim_name: ncat
+
+     # Sea-ice variable.
+     seaice_005:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: sice005
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: sice005
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+          # Define the z-dimension coordinate name.
+          zdim_name: ncat
+
+     # Sea-ice variable.
+     seaice_006:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: sice006
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: sice006
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+          # Define the z-dimension coordinate name.
+          zdim_name: ncat
+
+     # Sea-ice variable.
+     seaice_007:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: sice007
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: sice007
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+          # Define the z-dimension coordinate name.
+          zdim_name: ncat
+          
+     # Sea-ice flux variable.
+     qice_001:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: qice001
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: qice001
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+          # Define the z-dimension coordinate name.
+          zdim_name: ncat
+
+     # Sea-ice flux variable.
+     qice_002:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: qice002
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: qice002
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+          # Define the z-dimension coordinate name.
+          zdim_name: ncat
+
+     # Sea-ice flux variable.
+     qice_003:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: qice003
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: qice003
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+          # Define the z-dimension coordinate name.
+          zdim_name: ncat
+
+     # Sea-ice flux variable.
+     qice_004:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: qice004
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: qice004
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+          # Define the z-dimension coordinate name.
+          zdim_name: ncat
+
+     # Sea-ice flux variable.
+     qice_005:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: qice005
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: qice005
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+          # Define the z-dimension coordinate name.
+          zdim_name: ncat
+
+     # Sea-ice flux variable.
+     qice_006:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: qice006
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: qice006
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+          # Define the z-dimension coordinate name.
+          zdim_name: ncat
+
+     # Sea-ice flux variable.
+     qice_007:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: qice007
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: qice007
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+          # Define the z-dimension coordinate name.
+          zdim_name: ncat
+
+     # Snow variable.
+     snow_001:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: qsno001
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: qsno001
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+          # Define the z-dimension coordinate name.
+          zdim_name: ncat
+
+     # Zonal ice velocity.
+     uvel:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: uvel
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: uvel
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+     # Meridional ice velocity.
+     vvel:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: vvel
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: vvel
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+     # Cosine of the zenith angle.
+     coszen:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: coszen
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: coszen
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+     # Scaling factor for short-wave radiation components.
+     scale_factor:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: scale_factor
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: scale_factor
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+     # Downward short-wave radiation variable.
+     swvdr:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: swvdr
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: swvdr
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+     # Downward short-wave radiation variable.
+     swvdf:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: swvdf
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: swvdf
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+     # Downward short-wave radiation variable.
+     swidr:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: swidr
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: swidr
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+     # Downward short-wave radiation variable.
+     swidf:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: swidf
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: swidf
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+     # Ocean ice-stress variable.
+     strocnxT:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: strocnxT
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: strocnxT
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+          
+     # Ocean ice-stress variable.
+     strocnyT:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: strocnyT
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: strocnyT
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+     # Ocean ice-stress variable.
+     stressp_1:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: stressp_1
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: stressp_1
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+     # Ocean ice-stress variable.
+     stressp_2:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: stressp_2
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: stressp_2
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+     # Ocean ice-stress variable.
+     stressp_3:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: stressp_3
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: stressp_3
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+     # Ocean ice-stress variable.
+     stressp_4:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: stressp_4
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: stressp_4
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+     # Ocean ice-stress variable.
+     stressm_1:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: stressm_1
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: stressm_1
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+     # Ocean ice-stress variable.
+     stressm_2:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: stressm_2
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: stressm_2
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+     # Ocean ice-stress variable.
+     stressm_3:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: stressm_3
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: stressm_3
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+     # Ocean ice-stress variable.
+     stressm_4:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: stressm_4
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: stressm_4
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+     # Ocean ice-stress variable.
+     stress12_1:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: stress12_1
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: stress12_1
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+     # Ocean ice-stress variable.
+     stress12_2:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: stress12_2
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: stress12_2
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+     # Ocean ice-stress variable.
+     stress12_3:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: stress12_3
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: stress12_3
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+     # Ocean ice-stress variable.
+     stress12_4:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: stress12_4
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: stress12_4
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1
+
+     # Ice extent mask.
+     iceumask:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: iceumask
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: iceumask
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/cice5_model_0.25.res_2015120100.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: nrstnghbr
+
+          # Define the x-dimension coordinate name.
+          xdim_name: xaxis_1
+
+          # Define the y-dimension coordinate name.
+          ydim_name: yaxis_1

@@ -1,0 +1,418 @@
+# $$$ YAML DOCUMENTATION BLOCK
+  
+# UFS-RNR-containers :: apps/initconds_remapper/demo/mom6.initconds_remapper.yaml
+
+# AUTHOR: Henry R. Winterbottom
+
+# EMAIL: henry.winterbottom@noaa.gov
+
+# DESCRIPTION:
+
+# This YAML formatted file contains the user attributes required to
+# remap a MOM6 initial condition and/or restart formatted file from
+# one (nominal) resolution to another.
+
+#----
+
+# Define the output netCDF file to contained the remapped variable
+# fields/grids.
+output_netCDF: /work/remapper/MOM6.ic.1p0.nc
+
+# Specify the supported forecast model for which the remapping is to
+# performed; supported forecast models are as follows:
+
+# CICE: The Community Ice Code (e.g., the Los Alamos Ice Model);
+
+# GLORYS: Global Ocean Reanalysis and Simulation;
+
+# MOM6: The Modular Ocean Model;
+
+# ORAS5: Ocean Reanalysis System 5.
+forecast_model: mom6
+
+# Define the interpolation scheme; currently available options are:
+
+# esmf: Earth System Modeling Framework; this requires seperate files
+#       for the bilinear and nearest neighbor interpolation
+#       remappings.
+
+# slint: Spherical Linear Interpolation; this requires a single file
+#        for the bilinear and nearest neighbor interpolation
+#        remappings.
+interp_scheme: esmf
+
+# Define the total number of vertical levels to be remapped; the input
+# and the output variable levels should be identical.
+nlevs: 75
+
+# Define the file-path to the destination grid bathymetry for the
+# above-specified (nominal) resolution.
+bathy_file: /work/gridspec/mom6_cice_grids.gridspec/1p0/ocean_topog.nc
+
+# Define the file-path to the grid-locations to be editted; if no file
+# exists or the user does not wish to modify the bathymetry during the
+# application, this value should be set to None.
+bathy_edits_file: /work/gridspec/mom6_cice_grids.gridspec/1p0/topo_edits_011818.nc
+
+#----
+
+# Configuration options for all input and output grids.
+grids:
+
+     # Define the source grid attributes.
+     source:     
+     
+          # Define the source grid netCDF formatted file name.
+          grid_ncfile: /work/gridspec/mom6_cice_grids.gridspec/0p25/gridspec.tripolar.0p25.nc
+          topo_ncfile: /work/gridspec/mom6_cice_grids.gridspec/0p25/ocean_topog.nc
+
+          # Define the Arakawa grid type; see
+          # https://en.wikipedia.org/wiki/Arakawa_grids.
+          arakawa: C
+
+          # Define the Arakawa mass-coordinate geographical grid
+          # attributes.
+          mass:
+
+               # Define the netCDF variable name for the latitude
+               # coordinate variable.
+               nclat: tlat
+
+               # Define the netCDF variable name for the longitude
+               # coordinate variable.
+               nclon: tlon
+
+          # Define the Arakawa u-velocity coordinate geographical grid
+          # attributes.
+          uvel:
+
+               # Define the netCDF variable name for the latitude
+               # coordinate variable.
+               nclat: ulat
+
+               # Define the netCDF variable name for the longitude
+               # coordinate variable.
+               nclon: ulon
+
+          # Define the Arakawa v-velocity coordinate geographical grid
+          # attributes.
+          vvel:
+
+               # Define the netCDF variable name for the latitude
+               # coordinate variable.
+               nclat: vlat
+
+               # Define the netCDF variable name for the longitude
+               # coordinate variable.
+               nclon: vlon
+          
+     # Define the destination grid attributes.
+     destination:
+          
+          # Define the destination grid netCDF formatted file name.
+          grid_ncfile: /work/gridspec/mom6_cice_grids.gridspec/1p0/gridspec.tripolar.1p0.nc
+          topo_ncfile: /work/gridspec/mom6_cice_grids.gridspec/1p0/ocean_topog.nc
+          
+          # Define the Arakawa grid type; see
+          # https://en.wikipedia.org/wiki/Arakawa_grids.
+          arakawa: C          
+          
+          # Define the Arakawa mass-coordinate geographical grid
+          # attributes.
+          mass:
+
+               # Define the netCDF variable name for the latitude
+               # coordinate variable.
+               nclat: tlat
+
+               # Define the netCDF variable name for the longitude
+               # coordinate variable.
+               nclon: tlon
+
+          # Define the Arakawa u-velocity coordinate geographical grid
+          # attributes.
+          uvel:
+
+               # Define the netCDF variable name for the latitude
+               # coordinate variable.
+               nclat: ulat
+
+               # Define the netCDF variable name for the longitude
+               # coordinate variable.
+               nclon: ulon
+
+          # Define the Arakawa v-velocity coordinate geographical grid
+          # attributes.
+          vvel:
+
+               # Define the netCDF variable name for the latitude
+               # coordinate variable.
+               nclat: vlat
+
+               # Define the netCDF variable name for the longitude
+               # coordinate variable.
+               nclon: vlon
+
+#----
+
+# Configuration options for all files containing remapping
+# coefficients and/or weightings.
+remap:
+
+     # Specify whether to rotate the zonal and meridional velocity
+     # current variables during interpolation; this is only required
+     # for instances when the zonal and meridional current velocities
+     # are not defined at mass coordinate locations (i.e., the zonal
+     # and meridional current velocities are not defined on an Arakawa
+     # A-grid).
+     rotate_currents: True
+
+     # Destination mass grid to destination zonal velocity grid
+     # bilinear remapping attributes.
+     dstmass2dstuvel_bilinear: /work/esmf_remap/tripolar.1p0_1p0.bilinear.t2u_remap.nc
+
+     # Destination mass grid to destination meridional velocity grid
+     # bilinear remapping attributes.
+     dstmass2dstvvel_bilinear: /work/esmf_remap/tripolar.1p0_1p0.bilinear.t2v_remap.nc
+     
+     # Source mass grid to destination mass grid bilinear remapping
+     # attributes.
+     srcmass2dstmass_bilinear: /work/esmf_remap/tripolar.0p25_1p0.bilinear.t2t_remap.nc
+
+     # Source mass grid to destination mass grid nearest-neighbor
+     # remapping attributes.
+     srcmass2dstmass_nrstnghbr: /work/esmf_remap/tripolar.0p25_1p0.nearest_s2d.t2t_remap.nc
+
+     # Source zonal velocity grid to destination mass grid bilinear
+     # remapping attributes.
+     srcuvel2dstmass_bilinear: /work/esmf_remap/tripolar.0p25_1p0.bilinear.u2t_remap.nc
+
+     # Source meridional velocity grid to destination mass grid
+     # bilinear remapping attributes.
+     srcvvel2dstmass_bilinear: /work/esmf_remap/tripolar.0p25_1p0.bilinear.v2t_remap.nc
+
+     # Source zonal velocity grid to source mass grid bilinear
+     # remapping attributes.
+     srcuvel2srcmass_bilinear: /work/esmf_remap/tripolar.0p25_0p25.bilinear.u2t_remap.nc
+     
+     # Source meridional velocity grid to source mass grid bilinear
+     # remapping attributes.
+     srcvvel2srcmass_bilinear: /work/esmf_remap/tripolar.0p25_0p25.bilinear.v2t_remap.nc
+     
+#----
+
+# The following section describes the variables to be interpolated;
+# the user must specify the netCDF attributes as well as the Arakawa-C
+# grid attributes for the respective variables; the Arakawa-C grid
+# attributes (e.g., grid_stagger) options as follows:
+
+# mass; Arakawa grid mass variable locations;
+
+# uvel: Arakawa grid u-velocity variable locations;
+
+# vvel: Arakawa grid v-velocity variable locations;
+
+# There are also two-types of interpolation supported via either ESMF
+# or SLINT; the options are as follows:
+
+# bilinear; bi-linear interpolation
+
+# nrstnghbr; nearest-neighbor interpolation
+
+# Attributes for MOM6 variables to be remapped (e.g., interpolated).
+variables:
+
+     # Sea-surface height.
+     sea_surface_height:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: sfc
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: sfc          
+          
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/MOM.res_1.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: bilinear
+
+          # Define the x-dimension coordinate name.
+          xdim_name: lonh
+
+          # Define the y-dimension coordinate name.
+          ydim_name: lath
+
+     # Salinity.
+     salinity:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: Salt
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: Salt  
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/MOM.res.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: bilinear
+
+          # Define the x-dimension coordinate name.
+          xdim_name: lonh
+
+          # Define the y-dimension coordinate name.
+          ydim_name: lath
+
+          # Define the z-dimension coordinate name.
+          zdim_name: Layer
+
+     # Temperature.
+     temperature:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: Temp
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: Temp
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/MOM.res.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: bilinear
+
+          # Define the x-dimension coordinate name.
+          xdim_name: lonh
+
+          # Define the y-dimension coordinate name.
+          ydim_name: lath
+
+          # Define the z-dimension coordinate name.
+          zdim_name: Layer
+
+     # Thickness.
+     thickness:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: h
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: h
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/MOM.res.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: mass
+
+          # Define the interpolation type for the respective variable.
+          interp_type: bilinear
+
+          # Define the x-dimension coordinate name.
+          xdim_name: lonh
+
+          # Define the y-dimension coordinate name.
+          ydim_name: lath
+
+          # Define the z-dimension coordinate name.
+          zdim_name: Layer
+
+     # Zonal velocity.
+     ucurr:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: u
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: u
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/MOM.res.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: uvel
+
+          # Define the interpolation type for the respective variable.
+          interp_type: bilinear
+
+          # Define the x-dimension coordinate name.
+          xdim_name: lonq
+
+          # Define the y-dimension coordinate name.
+          ydim_name: lath
+
+          # Define the z-dimension coordinate name.
+          zdim_name: Layer
+
+     # Meridional velocity.
+     vcurr:
+
+          # Define the netCDF variable name for the source grid
+          # variable; this is the name of the variable within the
+          # input netCDF formatted file (see ncfilename, below).
+          src_ncvarname: v
+
+          # Define the netCDF variable name for the destination grid
+          # variable; this is the name of the variable within the
+          # output netCDF formatted file.
+          dst_ncvarname: v
+
+          # Define the basename for the netCDF formatted file
+          # containing the respective variable.
+          ncfilename: /work/remapper/inputs/MOM.res_1.nc
+
+          # Define the grid-staggering attributes for the respective
+          # variable.
+          grid_stagger: vvel
+
+          # Define the interpolation type for the respective variable.
+          interp_type: bilinear
+
+          # Define the x-dimension coordinate name.
+          xdim_name: lonh
+
+          # Define the y-dimension coordinate name.
+          ydim_name: latq
+
+          # Define the z-dimension coordinate name.
+          zdim_name: Layer

@@ -1,6 +1,6 @@
-tripolar.0p25_5p0.bilinear.u2t_remap:
+tripolar.0p25_0p5.bilinear.u2t_remap:
 
-     output_netCDF: /work/esmf_remap/tripolar.0p25_5p0.bilinear.u2t_remap.nc
+     output_netCDF: /work/esmf_remap/tripolar.0p25_0p5.bilinear.u2t_remap.nc
      interp_type: bilinear
 
      destination:
@@ -8,7 +8,7 @@ tripolar.0p25_5p0.bilinear.u2t_remap:
           is_grib: False
           gribfile: Null
           is_netcdf: True
-          ncfile: /work/gridspec/mom6_cice_grids.gridspec/5p0/gridspec.tripolar.5p0.nc
+          ncfile: /work/gridspec/mom6_cice_grids.gridspec/0p5/gridspec.tripolar.0p5.nc
           nclat: tlat
           nclon: tlon
           ncxdim_name: nx
@@ -28,9 +28,9 @@ tripolar.0p25_5p0.bilinear.u2t_remap:
 
 # ----
 
-tripolar.0p25_5p0.bilinear.v2t_remap:
+tripolar.0p25_0p5.bilinear.v2t_remap:
 
-     output_netCDF: /work/esmf_remap/tripolar.0p25_5p0.bilinear.v2t_remap.nc
+     output_netCDF: /work/esmf_remap/tripolar.0p25_0p5.bilinear.v2t_remap.nc
      interp_type: bilinear
 
      destination:
@@ -38,7 +38,7 @@ tripolar.0p25_5p0.bilinear.v2t_remap:
           is_grib: False
           gribfile: Null
           is_netcdf: True
-          ncfile: /work/gridspec/mom6_cice_grids.gridspec/5p0/gridspec.tripolar.5p0.nc
+          ncfile: /work/gridspec/mom6_cice_grids.gridspec/0p5/gridspec.tripolar.0p5.nc
           nclat: tlat
           nclon: tlon
           ncxdim_name: nx
@@ -60,9 +60,9 @@ tripolar.0p25_5p0.bilinear.v2t_remap:
 
 # ----
 
-tripolar.0p25_5p0.bilinear.t2t_remap:
+tripolar.0p25_0p5.bilinear.t2t_remap:
 
-     output_netCDF: /work/esmf_remap/tripolar.0p25_5p0.bilinear.t2t_remap.nc
+     output_netCDF: /work/esmf_remap/tripolar.0p25_0p5.bilinear.t2t_remap.nc
      interp_type: bilinear
 
      destination:
@@ -70,7 +70,7 @@ tripolar.0p25_5p0.bilinear.t2t_remap:
           is_grib: False
           gribfile: Null
           is_netcdf: True
-          ncfile: /work/gridspec/mom6_cice_grids.gridspec/5p0/gridspec.tripolar.5p0.nc
+          ncfile: /work/gridspec/mom6_cice_grids.gridspec/0p5/gridspec.tripolar.0p5.nc
           nclat: tlat
           nclon: tlon
           ncxdim_name: nx
@@ -90,9 +90,9 @@ tripolar.0p25_5p0.bilinear.t2t_remap:
 
 # ----
           
-tripolar.0p25_5p0.nearest_s2d.t2t_remap:
+tripolar.0p25_0p5.nearest_s2d.t2t_remap:
 
-     output_netCDF: /work/esmf_remap/tripolar.0p25_5p0.nearest_s2d.t2t_remap.nc
+     output_netCDF: /work/esmf_remap/tripolar.0p25_0p5.nearest_s2d.t2t_remap.nc
      interp_type: nearest_s2d
 
      destination:
@@ -100,7 +100,7 @@ tripolar.0p25_5p0.nearest_s2d.t2t_remap:
           is_grib: False
           gribfile: Null
           is_netcdf: True
-          ncfile: /work/gridspec/mom6_cice_grids.gridspec/5p0/gridspec.tripolar.5p0.nc
+          ncfile: /work/gridspec/mom6_cice_grids.gridspec/0p5/gridspec.tripolar.0p5.nc
           nclat: tlat
           nclon: tlon
           ncxdim_name: nx
@@ -180,9 +180,9 @@ tripolar.0p25_0p25.bilinear.v2t_remap:
 
 # ----
           
-tripolar.5p0_5p0.bilinear.t2u_remap:
+tripolar.0p5_0p5.bilinear.t2u_remap:
 
-     output_netCDF: /work/esmf_remap/tripolar.5p0_5p0.bilinear.t2u_remap.nc
+     output_netCDF: /work/esmf_remap/tripolar.0p5_0p5.bilinear.t2u_remap.nc
      interp_type: bilinear
 
      destination:
@@ -190,7 +190,7 @@ tripolar.5p0_5p0.bilinear.t2u_remap:
           is_grib: False
           gribfile: Null
           is_netcdf: True
-          ncfile: /work/gridspec/mom6_cice_grids.gridspec/5p0/gridspec.tripolar.5p0.nc
+          ncfile: /work/gridspec/mom6_cice_grids.gridspec/0p5/gridspec.tripolar.0p5.nc
           nclat: ulat
           nclon: ulon
           ncxdim_name: nx
@@ -202,7 +202,7 @@ tripolar.5p0_5p0.bilinear.t2u_remap:
           is_grib: False
           gribfile: Null
           is_netcdf: True
-          ncfile: /work/gridspec/mom6_cice_grids.gridspec/5p0/gridspec.tripolar.5p0.nc
+          ncfile: /work/gridspec/mom6_cice_grids.gridspec/0p5/gridspec.tripolar.0p5.nc
           nclat: tlat
           nclon: tlon
           ncxdim_name: nx
@@ -210,9 +210,9 @@ tripolar.5p0_5p0.bilinear.t2u_remap:
 
 # ----
           
-tripolar.5p0_5p0.bilinear.t2v_remap:
+tripolar.0p5_0p5.bilinear.t2v_remap:
 
-     output_netCDF: /work/esmf_remap/tripolar.5p0_5p0.bilinear.t2v_remap.nc
+     output_netCDF: /work/esmf_remap/tripolar.0p5_0p5.bilinear.t2v_remap.nc
      interp_type: bilinear
 
      destination:
@@ -220,7 +220,7 @@ tripolar.5p0_5p0.bilinear.t2v_remap:
           is_grib: False
           gribfile: Null
           is_netcdf: True
-          ncfile: /work/gridspec/mom6_cice_grids.gridspec/5p0/gridspec.tripolar.5p0.nc
+          ncfile: /work/gridspec/mom6_cice_grids.gridspec/0p5/gridspec.tripolar.0p5.nc
           nclat: vlat
           nclon: vlon
           ncxdim_name: nx
@@ -232,7 +232,7 @@ tripolar.5p0_5p0.bilinear.t2v_remap:
           is_grib: False
           gribfile: Null
           is_netcdf: True
-          ncfile: /work/gridspec/mom6_cice_grids.gridspec/5p0/gridspec.tripolar.5p0.nc
+          ncfile: /work/gridspec/mom6_cice_grids.gridspec/0p5/gridspec.tripolar.0p5.nc
           nclat: tlat
           nclon: tlon
           ncxdim_name: nx
