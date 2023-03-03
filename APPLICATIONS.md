@@ -45,7 +45,6 @@ container, do as follows.
 
 ~~~
 user@host:$ docker container run -v /path/to/ufs_tools:/ufs_tools -v /path/to/run:/run run -it ubuntu20.04-miniconda_ufs_pyutils.ufs_tools:latest
-user@host:$ export PYTHONPATH=/ufs_tools/ush:$PYTHONPATH
 user@host:$ cd /ufs_tools/scripts
 user@host:$ python compute_esmf_remap.py --yaml_file=/path/to/esmf_remap/yaml
 ~~~
@@ -68,7 +67,6 @@ container, do as follows.
 
 ~~~
 user@host:$ docker container run -v /path/to/ufs_tools:/ufs_tools -v /path/to/run:/run run -it ubuntu20.04-miniconda_ufs_pyutils.ufs_tools:latest
-user@host:$ export PYTHONPATH=/ufs_tools/ush:$PYTHONPATH
 user@host:$ cd /ufs_tools/wrappers
 user@host:$ python wrapper_esmf_remap.py --yaml_file /path/to/wrapper_esmf_remap/yaml --yaml_template /path/to/wrapper_esmf/wrapper_yaml --script_path /path/to/scripts/compute_esmf_remap.py
 ~~~
@@ -98,7 +96,6 @@ container, do as follows.
 
 ~~~
 user@host:$ docker container run -v /path/to/ufs_tools:/ufs_tools -v /path/to/run:/run run -it ubuntu20.04-miniconda_ufs_pyutils.ufs_tools:latest
-user@host:$ export PYTHONPATH=/ufs_tools/ush:$PYTHONPATH
 user@host:$ cd /ufs_tools/scripts
 user@host:$ python compute_gridspec.py --yaml_file=/path/to/gridspec/yaml
 ~~~
@@ -106,6 +103,38 @@ user@host:$ python compute_gridspec.py --yaml_file=/path/to/gridspec/yaml
 Note that the `yaml_file` attribute path is relative to the Docker
 container directory tree. Descriptions of the YAML-formatted file
 attributes can be found [here](parm/gridspec/README.md).
+
+## Remapper
+
+The `remapper` application provides an interface for remapping
+variable fields between different projection and/or grid-spacing
+resolution grids. This application makes use of the outputs produced
+by the `gridspec` and `esmf_remap` applications.
+
+To launch the application in the user shell, do as follows.
+
+~~~
+user@host:$ cd scripts/
+user@host:$ python compute_remapper.py --yaml_file /path/to/remapper/yaml
+~~~
+
+In the above example, the `yaml_file` attribute is a YAML-formatted
+file containing the grid and variable attributes for the remapping
+application. Examples for both MOM6 and CICE can be found
+[here](./parm/remapper).
+
+If choosing to launch the application within the available Docker
+container, do as follows.
+
+~~~
+user@host:$ docker container run -v /path/to/ufs_tools:/ufs_tools -v /path/to/run:/run run -it ubuntu20.04-miniconda_ufs_pyutils.ufs_tools:latest
+user@host:$ cd /ufs_tools/scripts
+user@host:$ python compute_remapper.py --yaml_file=/path/to/remapper/yaml
+~~~
+
+Note that the `yaml_file` attribute path is relative to the Docker
+container directory tree. Descriptions of the YAML-formatted file
+attributes can be found [here](parm/remapper/README.md).
 
 #
 
