@@ -274,6 +274,34 @@ illustrating the remapping of MOM6 and CICE :math:`0.25^{\circ}`
 (left) resolution analyses to :math:`1.0^{\circ}` (center) and
 :math:`5.0^{\circ}` (right) tripolar grid projections.
 
+.. figure:: _images/MOM6.sst.0p25.png
+   :width: 33%
+
+.. figure:: _images/MOM6.sst.1p0.png
+   :width: 33%
+
+.. figure:: _images/MOM6.sst.5p0.png
+   :width: 33%
+
+.. figure:: _images/CICE.icefrac.0p25.npstere.png
+   :width: 33%
+
+.. figure:: _images/CICE.icefrac.1p0.npstere.png
+   :width: 33%
+
+.. figure:: _images/CICE.icefrac.5p0.npstere.png
+   :width: 33%
+
+.. figure:: _images/CICE.icefrac.0p25.spstere.png
+   :width: 33%
+
+.. figure:: _images/CICE.icefrac.1p0.spstere.png
+   :width: 33%
+
+.. figure:: _images/CICE.icefrac.5p0.spstere.png
+   :width: 33%
+
+      
 .. image:: _images/MOM6.sst.0p25.png
    :width: 33%
 
