@@ -18,8 +18,8 @@ sys.path.insert(0, os.path.abspath('.'))
 # -- Project information -----------------------------------------------------
 
 project = 'UFS Tools'
-copyright = 'NOAA/EMC'
-author = 'Henry R. Winterbottom'
+copyright = '2023 Henry R. Winterbottom'
+author = '2023 Henry R. Winterbottom'
 
 # The full version, including alpha/beta/rc tags
 release = '0.1'
@@ -72,8 +72,7 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinxdoc'
-# 'sphinx_rtd_theme'
+html_theme = 'sphinx_rtd_theme'
 html_theme_path = ["_themes", ]
 
 # Theme options are theme-specific and customize the look and feel of a theme
