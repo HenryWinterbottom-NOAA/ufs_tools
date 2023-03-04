@@ -18,12 +18,62 @@
 # =========================================================================
 
 """
-pass # for now
+Script
+------
+
+    compute_remapper.py
+
+Description
+-----------
+
+    This script is the driver script for remapper application.
+
+Classes
+-------
+
+    ComputeRemapper(options_obj)
+
+        This is the base-class object for all remapper applications.
+
+Functions
+---------
+
+    main()
+
+        This is the driver-level function to invoke the tasks within
+        this script.
+
+Usage
+-----
+
+    user@host:$ python compute_remapper.py --yaml_file /path/to/yaml_file
+
+Parameters
+----------
+
+    yaml_file: str
+
+        A Python string specifying the path to the YAML-formatted
+        configuration file for the respective remapper application.
+
+        --yaml_file /path/to/yaml/file or -yaml_file /path/to/yaml/file
+
+Requirements
+------------
+
+- ufs_pytils; https://github.com/HenryWinterbottom-NOAA/ufs_pyutils
+
+Author(s)
+---------
+
+    Henry R. Winterbottom; 03 March 2023
+
+History
+-------
+
+    2023-03-03: Henry Winterbottom -- Initial implementation.
 
 """
-
-# ----
-
 
 # ----
 
@@ -59,7 +109,7 @@ class ComputeRemapper:
     Description
     -----------
 
-
+    This is the base-class object for all remapper applications.
 
     Parameters
     ----------
@@ -91,11 +141,13 @@ class ComputeRemapper:
 
         This method performs the following tasks:
 
-        (1)
+        (1) Executes the remapper application to interpolate (i.e.,
+            remap) variable fields between grid projections and/or
+            grid-spacing resolutions.
 
         """
 
-        #
+        # Remap the variable fields accordingly.
         self.remapper.run()
 
 
