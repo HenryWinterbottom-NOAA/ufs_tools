@@ -324,7 +324,8 @@ class Remapper:
                     object_in=grid_obj, key="output_netcdf", value=output_netcdf
                 )
 
-                fileio_interface.dirpath_tree(path=os.path.dirname(output_netcdf))
+                fileio_interface.dirpath_tree(
+                    path=os.path.dirname(output_netcdf))
 
         return grid_obj
 
@@ -509,7 +510,8 @@ class Remapper:
 
         # Define the variable and respective forecast model attributes
         # accordingly.
-        (varinfo_obj, soca_varinfo_obj) = [parser_interface.object_define(), None]
+        (varinfo_obj, soca_varinfo_obj) = [
+            parser_interface.object_define(), None]
         varinfo_obj = parser_interface.object_setattr(
             object_in=varinfo_obj, key="forecast_model", value=self.forecast_model
         )
@@ -615,17 +617,6 @@ class Remapper:
             accordance with the specified forecast model.
 
         """
-
-        # Define the source and destination grid attributes.
-        #        self.srcgrid_obj = self.getgrid_info(grid_name="source")
-        #        self.dstgrid_obj = self.getgrid_info(grid_name="destination")
-
-        # Define the remapping attributes.
-        #        self.remap_obj = self.getremap_info()
-
-        # Collect the variable attributes from the experiment
-        # configuration.
-        #        (self.varinfo_obj, self.soca_varinfo_obj) = self.getvar_info()
 
         # Remap the respective forecast model variables.
         self.remap()

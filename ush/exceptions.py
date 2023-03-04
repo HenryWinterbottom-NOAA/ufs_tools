@@ -51,6 +51,11 @@ Classes
         This is the base-class for exceptions encountered within the
         ush/remapper module; it is a sub-class of Error.
 
+    TCDiagsError()
+
+        This is the base-class for exceptions encountered within the
+        ush/tcdiags module; it is a sub-class of Error.
+
 Requirements
 ------------
 
@@ -76,7 +81,7 @@ from utils.error_interface import Error
 
 # Define all available attributes.
 __all__ = ["ESMFRemapError", "GridSpecError",
-           "InnovStatsComputeError", "RemapperError"]
+           "InnovStatsComputeError", "RemapperError", "TCDiagsError"]
 
 # ----
 
@@ -135,5 +140,18 @@ class RemapperError(Error):
 
     This is the base-class for exceptions encountered within the
     ush/remapper module; it is a sub-class of Error.
+
+    """
+
+# ----
+
+
+class TCDiagsError(Error):
+    """
+    Description
+    -----------
+
+    This is the base-class for exceptions encountered within the
+    ush/tcdiags module; it is a sub-class of Error.
 
     """
