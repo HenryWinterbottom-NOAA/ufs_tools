@@ -25,13 +25,16 @@
 
 # ----
 
-import numpy
-from wrf import interplevel
-
+from math import asin, cos, radians, sin
 from typing import List
 
+# from scipy.spatial import KDTree
+
+import numpy
+from tcdiags.geomets import haversine
 from exceptions import TCDiagsError
 from utils.logger_interface import Logger
+# from wrf import interplevel
 
 # ----
 
@@ -42,6 +45,113 @@ logger = Logger()
 __author__ = "Henry R. Winterbottom"
 __maintainer__ = "Henry R. Winterbottom"
 __email__ = "henry.winterbottom@noaa.gov"
+
+# ----
+
+
+def interp_ll2ra(varin: numpy.array, lats: numpy.array,
+                 lons: numpy.array, lon_0: float, lat_0: float,
+                 max_radius: float, drho: float, dphi: float) -> numpy.array:
+    """ """
+
+    # Initialize the coordinate arrays.
+    varin = numpy.ravel(varin)
+    lats = numpy.ravel(lats)
+    lons = numpy.ravel(lons)
+
+    # Compute the radial distance relative to the specified
+    # geographical coordinate location.
+    rho = numpy.array([haversine((lats[idx], lons[idx]), (lat_0, lon_0))
+                       for idx in range(len(lats))])
+
+    # Define the grid attributes relative to the specified
+    # geographical coordinate location.
+    xlocs = numpy.where(numpy.logical_and(rho >= 0.0, rho <= max_radius))[0]
+    xrho = numpy.array([rho[idx] for idx in xlocs])
+    xlats = numpy.array([lats[idx] for idx in xlocs])
+    xlons = numpy.array([lons[idx] for idx in xlocs])
+
+    xx = numpy.array([haversine((lat_0, lon_0), (lat_0, lons[idx]))
+                      for idx in xlocs])
+    xx = numpy.where(xlons < lon_0, -1.0*xx, xx)
+
+    yy = numpy.array([haversine((lat_0, lon_0), (lats[idx], lon_0))
+                      for idx in xlocs])
+    yy = numpy.where(xlats < lat_0, -1.0*yy, yy)
+
+    # Compute the azimuthal angle relative to the specified
+    # geographical coordinate location.
+    xphi = numpy.arctan2(yy, xx)
+
+    # Interpolate the Cartesian grid to the defined polar coordinate
+    # grid.
+    var = numpy.empty()  # xrho.shape[0], xphi.shape[0]))
+    var[:] = numpy.nan
+
+    dphi = numpy.radians(dphi)
+    radius = drho
+    idx = 0
+
+    while(radius <= max(xrho)):
+
+        radians = numpy.ndarray.tolist(numpy.where(numpy.logical_and(
+            xrho >= radius, xrho <= radius + drho))[0])
+
+        # while(phi <= 2*numpy.pi):
+
+        #phi = 0.0
+
+        phi = -1.0*numpy.pi
+        #pidx = 0
+        while(phi <= numpy.pi):
+
+            phis = numpy.ndarray.tolist(numpy.where(numpy.logical_and(
+                xphi >= phi, xphi <= (phi + dphi)))[0])
+
+            idxs = list(set(radians) & set(phis))
+
+            var[idx] = numpy.mean(varin[idxs])
+
+            # print(phis)
+
+            #    phis = numpy.where(
+
+            #    var = [varin[idx] for idx in xlocs if (xphi[idx] >= phi and xphi[idx] <= (phi+dphi) and
+            #                                           xrho[idx] >= radius and xrho[idx] <= (radius + drho))]
+
+            # idxs = \
+            #    numpy.where(numpy.logical_and(numpy.logical_and(rho >= radius, rho <= (
+            #        radius + drho)), (phi >= phi, phi <= (phi+dphi))))[0]
+
+            #    print(var)
+
+            # print(varin[idxs])
+
+            #pidx = xphi[idxs]
+
+            # idxs = numpy.ndarray.tolist(
+            #    numpy.logical_and(pidx >= phi, pidx <= (
+            #        phi + dphi)))
+
+            # print(idxs)
+
+            # var = numpy.where((pidx >= phi and pidx <= (
+            #    phi + dphi)), numpy.ravel(varin), numpy.nan)
+
+            # print(var[idxs])
+
+            # pidxs = numpy.mean(
+
+            phi = phi + dphi
+            idx = idx + 1
+
+        # print(idxs)
+
+        radius = radius + drho
+        #ridx = ridx + 1
+
+    return (xrho, xphi, var)
+
 
 # ----
 
