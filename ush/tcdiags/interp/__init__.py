@@ -97,12 +97,7 @@ def interp_ll2ra(varin: numpy.array, lats: numpy.array,
         radians = numpy.ndarray.tolist(numpy.where(numpy.logical_and(
             xrho >= radius, xrho <= radius + drho))[0])
 
-        # while(phi <= 2*numpy.pi):
-
-        #phi = 0.0
-
         phi = -1.0*numpy.pi
-        #pidx = 0
         while(phi <= numpy.pi):
 
             phis = numpy.ndarray.tolist(numpy.where(numpy.logical_and(
@@ -112,43 +107,24 @@ def interp_ll2ra(varin: numpy.array, lats: numpy.array,
 
             var[idx] = numpy.mean(varin[idxs])
 
-            # print(phis)
-
-            #    phis = numpy.where(
-
-            #    var = [varin[idx] for idx in xlocs if (xphi[idx] >= phi and xphi[idx] <= (phi+dphi) and
-            #                                           xrho[idx] >= radius and xrho[idx] <= (radius + drho))]
-
-            # idxs = \
-            #    numpy.where(numpy.logical_and(numpy.logical_and(rho >= radius, rho <= (
-            #        radius + drho)), (phi >= phi, phi <= (phi+dphi))))[0]
-
-            #    print(var)
-
-            # print(varin[idxs])
-
-            #pidx = xphi[idxs]
-
-            # idxs = numpy.ndarray.tolist(
-            #    numpy.logical_and(pidx >= phi, pidx <= (
-            #        phi + dphi)))
-
-            # print(idxs)
-
-            # var = numpy.where((pidx >= phi and pidx <= (
-            #    phi + dphi)), numpy.ravel(varin), numpy.nan)
-
-            # print(var[idxs])
-
-            # pidxs = numpy.mean(
-
             phi = phi + dphi
             idx = idx + 1
 
-        # print(idxs)
-
         radius = radius + drho
-        #ridx = ridx + 1
+
+    var = numpy.array(var)
+    check = -1.0*numpy.isnan(var)
+
+    xp = check.ravel().nonzero()[0]
+    fp = var[-1.0*numpy.isnan(var)]
+
+    x = numpy.isnan(var).rave().nonzero[0]
+
+    var[numpy.isnan(var)] = numpy.interp(x, xp, fp)
+
+    (nrho, nphi) = [len(xrho), len(xphi)]
+
+    var = numpy.array(var).reshape((nrho, nphi))
 
     return (xrho, xphi, var)
 
