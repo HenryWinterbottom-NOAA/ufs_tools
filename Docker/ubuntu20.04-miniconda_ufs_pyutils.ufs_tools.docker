@@ -103,7 +103,8 @@ RUN /miniconda/bin/pip install pip --upgrade && \
     /miniconda/bin/conda install -c conda-forge cartopy && \
     /miniconda/bin/pip install tabulate && \
     /miniconda/bin/pip install jupyterlab && \
-    /miniconda/bin/pip install notebook    
+    /miniconda/bin/pip install notebook && \
+    /miniconda/bin/pip install wrf-python
 
 # ----
 
