@@ -31,6 +31,8 @@ from dataclasses import dataclass
 
 from confs.yaml_interface import YAML
 
+from tcdiags.io import TCDiagsIO
+
 from exceptions import TCDiagsError
 from utils.logger_interface import Logger
 
@@ -57,7 +59,12 @@ class TCDiags:
         self.logger = Logger()
         self.yaml_file = self.options_obj.yaml_file
         self.yaml_dict = YAML().read_yaml(yaml_file=self.yaml_file)
+        self.tcdiags_io = TCDiagsIO(yaml_dict=self.yaml_dict)
 
     def run(self) -> None:
         """
         """
+
+        inputs_obj = self.tcdiags_io.read_inputs()
+
+        # print(inputs_obj)
