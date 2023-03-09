@@ -367,6 +367,6 @@ class TCDiagsIO:
         hght = units.Quantity(pressure_to_height_std(
             pressure=inputs_obj.pres), "meter")
         inputs_obj = parser_interface.object_setattr(
-            object_in=inputs_obj.
+            object_in=inputs_obj, key="hght", value=hght)
 
         return inputs_obj
