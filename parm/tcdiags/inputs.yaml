@@ -1,0 +1,94 @@
+specific_humidity:
+
+     flip_lat: True
+     flip_z: True
+     
+     ncfile: /work/tcdiags/C96_era5anl_2016100100.nc
+     
+     ncvarname: spfh
+
+     squeeze: True
+     squeeze_axis: 0
+
+uwind:
+
+     flip_lat: True
+     flip_z: True
+     
+     ncfile: /work/tcdiags/C96_era5anl_2016100100.nc
+     
+     ncvarname: ugrd
+
+     squeeze: True
+     squeeze_axis: 0
+
+vwind:
+
+     flip_lat: True
+     flip_z: True
+     
+     ncfile: /work/tcdiags/C96_era5anl_2016100100.nc
+     
+     ncvarname: vgrd
+
+     squeeze: True
+     squeeze_axis: 0
+
+temperature:
+
+     flip_lat: True
+     flip_z: True
+     
+     ncfile: /work/tcdiags/C96_era5anl_2016100100.nc
+     
+     ncvarname: tmp
+
+     squeeze: True
+     squeeze_axis: 0
+
+longitude:
+
+     flip_lat: True
+     ncfile: /work/tcdiags/C96_era5anl_2016100100.nc     
+     ncvarname: lon
+     scale_add: -360.0
+     
+latitude:
+
+     flip_lat: True
+     ncfile: /work/tcdiags/C96_era5anl_2016100100.nc     
+     ncvarname: lat
+
+surface_pressure:
+
+     flip_lat: True
+     ncfile: /work/tcdiags/C96_era5anl_2016100100.nc
+     ncvarname: pressfc
+     squeeze: True
+     squeeze_axis: 0
+
+surface_height:
+
+     flip_lat: True
+     ncfile: /work/tcdiags/C96_era5anl_2016100100.nc
+     ncvarname: hgtsfc
+     squeeze: True
+     squeeze_axis: 0
+     scale_mult: 0.98
+
+pressure:
+
+     method: 1 # pressure thickness
+
+     ncfile: /work/tcdiags/C96_era5anl_2016100100.nc 
+     flip_lat: True
+     flip_z: True
+     squeeze: True
+     squeeze_axis: 0
+     ncvarname: dpres     
+
+#     psfc_ncfile: /work/tcdiags/C96_era5anl_2016100100.nc 
+#     psfc_flip_lat: True
+#     psfc_squeeze: True
+#     psfc_squeeze_axis: 0
+#     psfc_ncvarname: pressfc  

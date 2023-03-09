@@ -57,9 +57,11 @@ History
 
 # ----
 
-from dataclasses import dataclass
 from typing import Dict
 
+from tcdiags.atmos.pressure_from_thickness import pressure_from_thickness
+from metpy.calc import pressure_to_height_std
+from metpy.units import units
 import numpy
 from exceptions import TCDiagsError
 from ioapps import netcdf4_interface
@@ -68,8 +70,41 @@ from utils.logger_interface import Logger
 
 # ----
 
+# Check that the input file contains all of the mandatory
+# variables.
+INPUTS_DICT = {
+    "latitude": {"name": "lat", "units": "degree"},
+    "longitude": {"name": "lon", "units": "degree"},
+    "pressure": {"name": "pres", "units": "pascals"},
+    "specific_humidity": {"name": "spfh", "units": "kg/kg"},
+    "surface_height": {"name": "zsfc", "units": "gpm"},
+    "surface_pressure": {"name": "psfc", "units": "Pa"},
+    "temperature": {"name": "temp", "units": "K"},
+    "uwind": {"name": "uwnd", "units": "m/s"},
+    "vwind": {"name": "vwnd", "units": "m/s"},
+}
 
-@dataclass
+# Define the variable attributes.
+VARIN_ATTRS_DICT = {
+    "flip_lat": False,
+    "flip_z": False,
+    "method": -99,
+    "ncfile": None,
+    "ncvarname": None,
+    "scale_add": 0.0,
+    "scale_mult": 1.0,
+    "squeeze": False,
+    "squeeze_axis": 0,
+}
+
+# Pressure profile computation methods.
+PRES_PROF_COMP_METHODS_DICT = {
+    1: pressure_from_thickness
+}
+
+# ----
+
+
 class TCDiagsIO:
     """
     Description
@@ -120,6 +155,92 @@ class TCDiagsIO:
             )
             raise TCDiagsError(msg=msg)
 
+        self.variable_range_msg = "Variable %s range values: (%s, %s) %s."
+
+    def _get_pressure(self, inputs_obj: object) -> object:
+        """
+        Description
+        -----------
+
+        This method computes the pressure profile in accordance with
+        the experiment configuration attributes.
+
+        Parameters
+        ----------
+
+        inputs_obj: object
+
+            A Python object containing the mandatory input variables;
+            this includes, at minimum, the pressure and surface
+            pressure values; see below for additional information.
+
+        Returns
+        -------
+
+        inputs_obj: object
+
+            A Python object updated to contain the pressure profile
+            array in accordance with the method defined in the
+            experiment configuration.
+
+        Raises
+        ------
+
+        TCDiagsError:
+
+            * raised if the pressure variable attributes cannot be
+              determined from the experiment configuration or are not
+              defined within this module (see
+              `PRES_PROF_COMP_METHODS_DICT` above).
+
+        Notes
+        -----
+
+        For the respective pressure profile computations, the
+        respective methods assume the pressure array upon entry
+        contains the following:
+
+        1: pressure_from_thickness :: pres = the layer thickness; this
+           is used to derive the pressure profile by integrating from
+           the top layer thickness to the surface.
+
+        """
+
+        # Define the method to be used for the pressure profile
+        # computation; proceed accordingly.
+        var_dict = parser_interface.dict_key_value(
+            dict_in=self.inputs_dict, key="pressure", force=True, no_split=True)
+
+        if var_dict is None:
+            msg = ("The pressure variable attributes could not be determined from "
+                   "the experiment configuration. Aborting!!!"
+                   )
+            raise TCDiagsError(msg=msg)
+
+        method = parser_interface.dict_key_value(
+            dict_in=var_dict, key="method", force=True)
+        if method is None:
+            msg = ("The attribute `method` could not be determined for variable "
+                   "`pressure` in the experiment configuration. Aborting!!!"
+                   )
+            raise TCDiagsError(msg=msg)
+
+        # Compute the pressure profile accordingly.
+        app = parser_interface.dict_key_value(
+            dict_in=PRES_PROF_COMP_METHODS_DICT, key=method, force=True)
+        if app is None:
+            msg = f"The pressure profile method {method} is not defined. Aborting!!!"
+            raise TCDiagsError(msg=msg)
+
+        inputs_obj = app(inputs_obj=inputs_obj)
+
+        msg = (self.variable_range_msg % ("pressure", numpy.array(inputs_obj.pres).min(),
+                                          numpy.array(inputs_obj.pres).max(),
+                                          inputs_obj.pres.units))
+        self.logger.debug(msg=msg)
+
+        return inputs_obj
+
     def read_inputs(self) -> object:
         """
         Description
@@ -151,15 +272,9 @@ class TCDiagsIO:
 
         """
 
-        # Check that the input file contains all of the mandatory
-        # variables.
-        read_inputs_dict = {
-            "latitude": "lat_degrees",
-            "longitude": "lon_degrees",
-            "temperature": "tmp_K",
-        }
-
-        mand_inputs = set(list(sorted(read_inputs_dict.keys())))
+        # Check that all required variables are defined; proceed
+        # accordingly.
+        mand_inputs = set(list(sorted(INPUTS_DICT.keys())))
         yaml_inputs = set(list(sorted(self.inputs_dict.keys())))
         missing_vars = list(sorted(mand_inputs - yaml_inputs))
 
@@ -170,37 +285,24 @@ class TCDiagsIO:
             )
             raise TCDiagsError(msg=msg)
 
-        # Define the mandatory variables object; proceed accordingly.
+        # Build the input variables object; proceed accordingly.
         inputs_obj = parser_interface.object_define()
 
-        # Define the variable attributes.
-        varin_attrs_dict = {
-            "flip_lat": False,
-            "flip_z": False,
-            "ncfile": None,
-            "ncvarname": None,
-            "scale_add": 0.0,
-            "scale_mult": 1.0,
-            "squeeze": False,
-            "squeeze_axis": 0,
-        }
-
-        # Build the input variables object; proceed accordingly.
-        for yaml_key in yaml_inputs:
+        for yaml_key in INPUTS_DICT:
             varin_obj = parser_interface.object_define()
 
             var_dict = parser_interface.dict_key_value(
                 dict_in=self.inputs_dict, key=yaml_key, force=True, no_split=True
             )
 
-            for varin_attr in varin_attrs_dict:
+            for varin_attr in VARIN_ATTRS_DICT:
                 value = parser_interface.dict_key_value(
                     dict_in=var_dict, key=varin_attr, force=True, no_split=True
                 )
 
                 if value is None:
                     value = parser_interface.dict_key_value(
-                        dict_in=varin_attrs_dict,
+                        dict_in=VARIN_ATTRS_DICT,
                         key=varin_attr,
                         force=True,
                         no_split=True,
@@ -245,12 +347,26 @@ class TCDiagsIO:
                             pass
 
             values = varin_obj.scale_mult * (values) + varin_obj.scale_add
-            msg = f"Variable {yaml_key} range values: ({values.min()}, {values.max()})."
+
+            # Define the variable object accordingly.
+            (var_name, var_units) = [parser_interface.dict_key_value(
+                dict_in=INPUTS_DICT[yaml_key], key=key, no_split=True) for key in ["name", "units"]]
+
+            values = units.Quantity(values, var_units)
+            inputs_obj = parser_interface.object_setattr(
+                object_in=inputs_obj, key=var_name, value=values)
+
+            msg = (self.variable_range_msg % (yaml_key, numpy.array(values.min()),
+                                              numpy.array(values.max()), values.units))
             self.logger.debug(msg=msg)
 
-            # Update the input variables object.
-            inputs_obj = parser_interface.object_setattr(
-                object_in=inputs_obj, key=yaml_key, value=values
-            )
+        # Compute/define the pressure variable.
+        self._get_pressure(inputs_obj=inputs_obj)
+
+        # Compute the height assuming a standard atmosphere.
+        hght = units.Quantity(pressure_to_height_std(
+            pressure=inputs_obj.pres), "meter")
+        inputs_obj = parser_interface.object_setattr(
+            object_in=inputs_obj.
 
         return inputs_obj

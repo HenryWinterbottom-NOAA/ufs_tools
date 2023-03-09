@@ -1,0 +1,3 @@
+inputs_yaml: !INC /ufs_tools/parm/tcdiags/inputs.yaml
+
+
