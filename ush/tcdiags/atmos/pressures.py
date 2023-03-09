@@ -68,6 +68,13 @@ from utils.logger_interface import Logger
 
 # ----
 
+# Define all available functions.
+__all__ = [
+    "pressure_from_thickness"
+]
+
+# ----
+
 logger = Logger()
 
 # ----

@@ -31,7 +31,7 @@ Description
 Functions
 ---------
 
-    heights_from_pressure(inputs_obj)
+    height_from_pressure(inputs_obj)
 
         This function computes the geometric height profile from the
         pressure profile array.
@@ -61,6 +61,13 @@ from metpy.calc import pressure_to_height_std
 from metpy.units import units
 from tools import parser_interface
 from utils.logger_interface import Logger
+
+# ----
+
+# Define all available functions.
+__all__ = [
+    "height_from_pressure"
+]
 
 # ----
 
@@ -107,7 +114,8 @@ def height_from_pressure(inputs_obj: object) -> object:
     )
     logger.info(msg=msg)
 
-    hght = units.Quantity(pressure_to_height_std(pressure=inputs_obj.pres), "meter")
+    hght = units.Quantity(pressure_to_height_std(
+        pressure=inputs_obj.pres), "meter")
 
     # Update the input variable object.
     inputs_obj = parser_interface.object_setattr(
