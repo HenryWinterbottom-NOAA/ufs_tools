@@ -65,9 +65,7 @@ from utils.logger_interface import Logger
 # ----
 
 # Define all available functions.
-__all__ = [
-    "height_from_pressure"
-]
+__all__ = ["height_from_pressure"]
 
 # ----
 
@@ -114,8 +112,7 @@ def height_from_pressure(inputs_obj: object) -> object:
     )
     logger.info(msg=msg)
 
-    hght = units.Quantity(pressure_to_height_std(
-        pressure=inputs_obj.pres), "meter")
+    hght = units.Quantity(pressure_to_height_std(pressure=inputs_obj.pres), "meter")
 
     # Update the input variable object.
     inputs_obj = parser_interface.object_setattr(
