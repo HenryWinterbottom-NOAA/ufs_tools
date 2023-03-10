@@ -80,6 +80,8 @@ pyyaml==6.0
 boto3==1.24.28
 schema==0.7.5
 wrf-python==1.3.4.1
+metpy==1.4.0
+pyspharm==1.0.9
 tabulate
 jupyterlab
 notebook
