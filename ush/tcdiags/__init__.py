@@ -34,6 +34,11 @@ from confs.yaml_interface import YAML
 from tcdiags.io import TCDiagsIO
 
 from exceptions import TCDiagsError
+
+from tcdiags.tc import FilterVortex
+
+from tools import parser_interface
+
 from utils.logger_interface import Logger
 
 # ----
@@ -61,10 +66,30 @@ class TCDiags:
         self.yaml_dict = YAML().read_yaml(yaml_file=self.yaml_file)
         self.tcdiags_io = TCDiagsIO(yaml_dict=self.yaml_dict)
 
+        # Define the available application options.
+        self.apps_dict = {
+            "tcfilt": FilterVortex}
+
     def run(self) -> None:
         """
         """
 
         inputs_obj = self.tcdiags_io.read_inputs()
 
-        # print(inputs_obj)
+        # Execute each of the specified applications.
+        for app in self.apps_dict:
+
+            # Check whether the application is to be executed; proceed
+            # accordingly.
+            opt_attr = parser_interface.object_getattr(
+                object_in=self.options_obj, key=app, force=True)
+
+            if opt_attr is not None:
+
+                if parser_interface.str_to_bool(opt_attr):
+
+                    # Launch the respective application.
+                    app_class = parser_interface.dict_key_value(
+                        dict_in=self.apps_dict, key=app, no_split=True)
+
+                    app_class(inputs_obj=inputs_obj).run()
