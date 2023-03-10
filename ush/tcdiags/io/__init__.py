@@ -41,7 +41,7 @@ Classes
 Requirements
 ------------
 
-- ufs_pytils; https://github.com/HenryWinterbottom-NOAA/ufs_pyutils]
+- ufs_pytils; https://github.com/HenryWinterbottom-NOAA/ufs_pyutils
 
 Author(s)
 ---------
@@ -59,8 +59,8 @@ History
 
 from typing import Dict
 
-from tcdiags.atmos.pressure_from_thickness import pressure_from_thickness
-from metpy.calc import pressure_to_height_std
+from tcdiags.atmos.heights import height_from_pressure
+from tcdiags.atmos.pressures import pressure_from_thickness
 from metpy.units import units
 import numpy
 from exceptions import TCDiagsError
@@ -360,13 +360,13 @@ class TCDiagsIO:
                                               numpy.array(values.max()), values.units))
             self.logger.debug(msg=msg)
 
-        # Compute/define the pressure variable.
-        self._get_pressure(inputs_obj=inputs_obj)
+        # Compute/define the remaining diagnostic variables.
+        inputs_obj = self._get_pressure(inputs_obj=inputs_obj)
+        inputs_obj = height_from_pressure(inputs_obj=inputs_obj)
 
-        # Compute the height assuming a standard atmosphere.
-        hght = units.Quantity(pressure_to_height_std(
-            pressure=inputs_obj.pres), "meter")
-        inputs_obj = parser_interface.object_setattr(
-            object_in=inputs_obj, key="hght", value=hght)
+        values = inputs_obj.hght
+        msg = (self.variable_range_msg % ("height", numpy.array(values.min()),
+                                          numpy.array(values.max()), values.units))
+        self.logger.debug(msg=msg)
 
         return inputs_obj
