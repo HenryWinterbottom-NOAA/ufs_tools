@@ -60,6 +60,20 @@ Parameters
 
         --yaml_file /path/to/yaml/file or -yaml_file /path/to/yaml/file
 
+Keywords
+--------
+
+    tcfilt: bool, optional
+
+        A Python boolean valued variable specifying whether to apply
+        the tropical cyclone (TC) filtering application described in
+        Winterbottom and Chassignet [2011] to the TCs defined within
+        the syndat-formatted filepath defined in the experiment
+        configuration; if not specified the attribute defaults to
+        NoneType.
+
+        --tcdiags True
+
 Requirements
 ------------
 
@@ -83,6 +97,8 @@ import os
 import time
 from dataclasses import dataclass
 
+from schema import Optional
+
 from tcdiags import TCDiags
 from utils.arguments_interface import Arguments
 from utils.logger_interface import Logger
@@ -100,7 +116,9 @@ __email__ = "henry.winterbottom@noaa.gov"
 EVAL_SCHEMA = True
 
 # Define the schema attributes.
-CLS_SCHEMA = {"yaml_file": str}
+CLS_SCHEMA = {"yaml_file": str,
+              Optional("tcfilt", default=False): bool
+              }
 
 # ----
 
